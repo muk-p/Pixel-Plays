@@ -4,8 +4,8 @@ import HeroSection from '@/Components/General/HeroSection';
 import SectionToggle from '@/Components/General/SectionToggle';
 import CategorySection from '@/Components/General/CategorySection';
 import ContactStrip from '@/Components/General/Contact';
-import GamingSection from '@/Components/shopping/GamingSection';
-import ShoppingSection from '@/Components/shopping/ShoppingSection';
+import GamingSection from '@/Components/Shopping/GamingSection';
+import ShoppingSection from '@/Components/Shopping/ShoppingSection';
 import { useShopState } from './ClientAppShell';
 
 export default function HomePage() {
