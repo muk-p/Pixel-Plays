@@ -1,0 +1,201 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  color-scheme: light dark;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --surface-alt: #f1f5f9;
+  --foreground: #0f172a;
+  --muted: #475569;
+  --border: #e2e8f0;
+  --accent: #4f46e5;
+  --accent-2: #14b8a6;
+  --danger: #dc2626;
+  --shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  --card-radius: 2rem;
+}
+
+@theme inline {
+  /* Register all your custom colors in Tailwind v4 format */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-alt: var(--surface-alt);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-danger: var(--danger);
+  
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html.dark {
+  --background: #020617;
+  --surface: #111827;
+  --surface-alt: #1f2937;
+  --foreground: #e2e8f0;
+  --muted: #94a3b8;
+  --border: #334155;
+  --accent: #818cf8;
+  --accent-2: #2dd4bf;
+  --danger: #f97316;
+  --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #020617;
+    --surface: #111827;
+    --surface-alt: #1f2937;
+    --foreground: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #334155;
+    --accent: #818cf8;
+    --accent-2: #2dd4bf;
+    --danger: #f97316;
+    --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+  }
+}
+
+html, body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  min-height: 100vh;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 250ms ease, color 250ms ease;
+}
+
+/* Base states for inputs without overriding Tailwind background classes */
+input, textarea, select {
+  color: var(--foreground);
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--muted);
+}
+
+::selection {
+  background: rgba(79, 70, 229, 0.20);
+  color: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  .bg-white { background-color: #111827 !important; }
+  .bg-gray-50,
+  .bg-slate-50,
+  .bg-slate-100,
+  .bg-gray-100,
+  .bg-blue-50,
+  .bg-purple-50,
+  .bg-green-50,
+  .bg-green-100,
+  .bg-yellow-50,
+  .bg-indigo-50 { background-color: #111827 !important; }
+  .bg-gray-200,
+  .bg-slate-200 { background-color: #1f2937 !important; }
+  .hover\:bg-gray-100:hover,
+  .hover\:bg-slate-100:hover,
+  .hover\:bg-indigo-100:hover,
+  .hover\:bg-purple-100:hover,
+  .active\:bg-gray-50:active { background-color: #1f2937 !important; }
+  .border-gray-100,
+  .border-slate-100,
+  .border-gray-200,
+  .border-slate-200,
+  .border-blue-100,
+  .border-purple-100,
+  .border-green-100,
+  .border-yellow-100 { border-color: #334155 !important; }
+  .text-gray-900,
+  .text-slate-900,
+  .text-gray-800,
+  .text-slate-800 { color: #f8fafc !important; }
+  .text-gray-700,
+  .text-slate-700,
+  .text-gray-600,
+  .text-slate-600,
+  .text-gray-500,
+  .text-gray-400,
+  .text-gray-300 { color: #cbd5e1 !important; }
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg,
+  .shadow-xl,
+  .shadow-2xl,
+  .shadow-inner { box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25) !important; }
+}
+
+.dark .bg-white { background-color: #111827 !important; }
+.dark .bg-gray-50,
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-gray-100,
+.dark .bg-blue-50,
+.dark .bg-purple-50,
+.dark .bg-green-50,
+.dark .bg-green-100,
+.dark .bg-yellow-50,
+.dark .bg-indigo-50 { background-color: #111827 !important; }
+.dark .bg-gray-200,
+.dark .bg-slate-200 { background-color: #1f2937 !important; }
+.dark .hover\:bg-gray-100:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .hover\:bg-indigo-100:hover,
+.dark .hover\:bg-purple-100:hover,
+.dark .active\:bg-gray-50:active { background-color: #1f2937 !important; }
+.dark .border-gray-100,
+.dark .border-slate-100,
+.dark .border-gray-200,
+.dark .border-slate-200,
+.dark .border-blue-100,
+.dark .border-purple-100,
+.dark .border-green-100,
+.dark .border-yellow-100 { border-color: #334155 !important; }
+.dark .text-gray-900,
+.dark .text-slate-900,
+.dark .text-gray-800,
+.dark .text-slate-800 { color: #f8fafc !important; }
+.dark .text-gray-700,
+.dark .text-slate-700,
+.dark .text-gray-600,
+.dark .text-slate-600,
+.dark .text-gray-500,
+.dark .text-gray-400,
+.dark .text-gray-300 { color: #cbd5e1 !important; }
+.dark .shadow-sm,
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl,
+.dark .shadow-2xl,
+.dark .shadow-inner { box-shadow: 0 20px 45px rgba(0, 0, 0, 0.25) !important; }
+
+/* Scrollbar configurations for Next.js */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
