@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import CodesManager from "@/components/Manager/Codes";
+import CodesManager from "@/Components/Manager/Codes";
 
 export default function ManagerCodesPage() {
   const [search, setSearch] = useState("");
