@@ -7,8 +7,8 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'GadgetFinds | Buy PS5, Xbox & Nintendo in Kenya',
-    template: '%s | GadgetFinds',
+    default: 'PixelPlays | Buy PS5, Xbox & Nintendo in Kenya',
+    template: '%s | PixelPlayss',
   },
   description:
     'Shop authentic PlayStation, Xbox, and Nintendo consoles plus gaming accessories in Kenya with fast door-to-door delivery and secure M-Pesa checkout.',
@@ -29,8 +29,8 @@ export const metadata = {
     type: 'website',
     locale: 'en_KE',
     url: siteUrl,
-    siteName: 'GadgetFinds',
-    title: 'GadgetFinds | Buy PS5, Xbox & Nintendo in Kenya',
+    siteName: 'PixelPlays',
+    title: 'PixelPlays | Buy PS5, Xbox & Nintendo in Kenya',
     description:
       'Authentic consoles, accessories, and gaming gear in Kenya with fast door-to-door delivery and M-Pesa checkout.',
     images: [
@@ -38,13 +38,13 @@ export const metadata = {
         url: '/og-image.png', // Best practice: OpenGraph images should be 1200x630 (not your tiny favicon)
         width: 1200,
         height: 630,
-        alt: 'GadgetFinds gaming consoles and accessories in Kenya',
+        alt: 'PixelPlays gaming consoles and accessories in Kenya',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'GadgetFinds | Buy PS5, Xbox & Nintendo in Kenya',
+    title: 'PixelPlays | Buy PS5, Xbox & Nintendo in Kenya',
     description:
       'Shop authentic consoles and accessories in Kenya with fast delivery and secure payments.',
     images: ['/og-image.png'],
