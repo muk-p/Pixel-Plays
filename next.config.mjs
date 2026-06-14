@@ -4,6 +4,9 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const BACKEND_HOSTNAME = process.env.NEXT_PUBLIC_API_HOSTNAME || 'localhost';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   outputFileTracingRoot: __dirname, 
@@ -12,16 +15,15 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '5000',
-        pathname: '/**', // FIXED: Changed from '/uploads/**' to '/**' to allow full absolute url matching paths
+        protocol: 'https', // Changed to https for your live server security
+        hostname: BACKEND_HOSTNAME,
+        pathname: '/**', 
       },
       {
         protocol: 'http',
-        hostname: '127.0.0.1',
+        hostname: 'localhost',
         port: '5000',
-        pathname: '/**', // FIXED: Allow absolute paths here as well
+        pathname: '/**', 
       },
     ],
   },
@@ -30,7 +32,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*',
+        destination: `${BACKEND_URL}/api/:path*`,
       },
     ];
   },
