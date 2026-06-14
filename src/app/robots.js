@@ -7,6 +7,6 @@ export default function robots() {
         disallow: ['/cart', '/checkout', '/api', '/manager', '/login', '/signup'],
       },
     ],
-    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL }/sitemap.xml`,
+    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://pixel-plays-iota.vercel.app' }/sitemap.xml`,
   };
 }
