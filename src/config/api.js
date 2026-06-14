@@ -2,7 +2,7 @@
 import { rateLimitedRequest } from '../utils/rateLimiter';
 
 // NEXT_PUBLIC_ prefix exposes this variable to the browser
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://4w26504b-5000.inc1.devtunnels.ms';
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ;
 
 const API_ENDPOINTS = {
   // Authentication
