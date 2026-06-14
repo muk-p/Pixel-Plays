@@ -54,10 +54,10 @@ export default function ManagerLayout({ children }) {
 
   // Helper array to generate our tabs beautifully
   const navigationTabs = [
-    { name: 'Sales Overview', path: '/manager/sales', icon: '💰' },
-    { name: 'Order Tracking', path: '/manager/orders', icon: '📦' },
-    { name: 'Hardware', path: '/manager/products', icon: '🔨' },
-    { name: 'Digital Codes', path: '/manager/codes', icon: '🔑' },
+    { name: 'Sales Overview', path: '/manager/sales'},
+    { name: 'Order Tracking', path: '/manager/orders' },
+    { name: 'Hardware', path: '/manager/products'},
+    { name: 'Digital Codes', path: '/manager/codes' },
   ];
 
   // 3. Authorized Dashboard Layout View
@@ -112,14 +112,6 @@ export default function ManagerLayout({ children }) {
               })}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setIsDark((value) => !value)}
-              className="inline-flex items-center gap-2 self-end rounded-full border border-gray-200 bg-white/80 px-3 py-2 text-xs font-semibold text-gray-600 shadow-sm transition hover:text-gray-900 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:text-white"
-            >
-              <span>{isDark ? '☀️' : '🌙'}</span>
-              {isDark ? 'Light mode' : 'Dark mode'}
-            </button>
           </div>
         </div>
 
