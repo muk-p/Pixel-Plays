@@ -51,9 +51,9 @@ export const metadata = {
     creator: '@gadgetfinds',
   },
   icons: {
-    icon: '/icon.png',
-    shortcut: '/icon.png',
-    apple: '/icon.png',
+    icon: '/2.png',
+    shortcut: '/2.png',
+    apple: '/2.png',
   },
 };
 
