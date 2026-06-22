@@ -247,7 +247,9 @@ const ShoppingSection = ({ searchQuery = "" }) => {
             <span>Loading More Gear...</span>
           </div>
         )}
-       
+       <p className="text-slate-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+            Done
+          </p>
         )}
       </div>
 
