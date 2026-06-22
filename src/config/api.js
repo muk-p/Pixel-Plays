@@ -2,7 +2,7 @@
 import { rateLimitedRequest } from '../utils/rateLimiter';
 
 // NEXT_PUBLIC_ prefix exposes this variable to the browser
-export const API_BASE_URL = process.env.REACT_PUBLIC_API_URL || 'http://localhost:5000'; // Default to localhost if not set
+export const API_BASE_URL = process.env.REACT_PUBLIC_API_URL ; // Default to localhost if not set
 
 const API_ENDPOINTS = {
   // Authentication
