@@ -196,21 +196,6 @@ const ShoppingSection = ({ searchQuery = "" }) => {
                         priority={true} 
                         unoptimized
                         className="object-cover transition-transform duration-500 ease-out group-hover:scale-104"
-
-                        onLoad={(event) => {
-                          const imgElement = event.currentTarget;
-                          const entry = performance.getEntriesByName(imgElement.src)[0];
-                          if (entry) {
-                            const loadTimeMs = Math.round(entry.duration);
-                            console.log(`[Image Speed] "${item.name}" loaded in ${loadTimeMs}ms (${entry.transferSize || 0} bytes)`);
-                          } else {
-                            console.log(`[Image Speed] "${item.name}" rendered successfully.`);
-                          }
-                        }}
-
-                        onError={() => {
-                          console.error(`[Image Error] Failed to load layout asset for item: ID ${item.id} - Name: "${item.name}"`);
-                        }}
                       />
                       {item.stock === 0 && (
                         <div className="absolute inset-0 bg-slate-900/45 backdrop-blur-[1px] flex items-center justify-center z-10 dark:bg-black/60">
@@ -262,10 +247,7 @@ const ShoppingSection = ({ searchQuery = "" }) => {
             <span>Loading More Gear...</span>
           </div>
         )}
-        {!hasMore && !loading && products.length > 0 && (
-          <p className="text-slate-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
-            ✕ You have viewed all gaming products
-          </p>
+       
         )}
       </div>
 
