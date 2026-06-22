@@ -50,11 +50,6 @@ export const metadata = {
     images: ['/og-image.png'],
     creator: '@gadgetfinds',
   },
-  icons: {
-    icon: '/2.png',
-    shortcut: '/2.png',
-    apple: '/2.png',
-  },
 };
 
 export const viewport = {
