@@ -1,5 +1,6 @@
 "use client"; // Required for useState, useEffect, useRef, and search query parameters
 
+import Link from 'next/link';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation'; 
 import axios from 'axios';
