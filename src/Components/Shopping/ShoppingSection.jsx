@@ -9,7 +9,6 @@ import Image from 'next/image';
 import { rateLimitedRequest } from '@/utils/rateLimiter';
 import localImageLoader from '@/config/ImageLoader'; 
 
-
 const formatCategoryId = (categoryId) =>
   String(categoryId || '')
     .toLowerCase()
@@ -19,111 +18,45 @@ const ShoppingSection = ({ searchQuery = "" }) => {
   const searchParams = useSearchParams(); 
   const activeCategory = searchParams.get('category');
   
-  // State variables optimized for low-footprint mobile memory loops
-  const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  // State tracking optimized for database category groupings
+  const [catalog, setCatalog] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [fetchingMore, setFetchingMore] = useState(false);
   
   const previousCategoryRef = useRef(activeCategory);
   const sectionRootRef = useRef(null); 
-  const observerTargetRef = useRef(null); // Tracks mobile scrolling viewport intersecting positions
 
-  // 1. INITIAL LOAD ENGINE: Fetches a lean batch of 8 items to maximize mobile Time-To-Interactive
+  // 1. INITIAL LOAD ENGINE: Pulls pre-grouped categories from backend instantly
   useEffect(() => {
-    const fetchInitialProducts = async () => {
+    const fetchGroupedCatalog = async () => {
       setLoading(true);
       try {
         const res = await rateLimitedRequest(() => 
-          axios.get(`${API_ENDPOINTS.SHOPPING.PRODUCTS}?page=1&limit=8`)
+          axios.get(`${API_ENDPOINTS.SHOPPING.PRODUCTS}`)
         );
-        setProducts(res.data.products || []);
-        setPage(1);
-        setHasMore(1 < (res.data.pagination?.pages || 1));
+        setCatalog(res.data.catalog || []);
       } catch (err) {
-        console.error("Error loading products:", err);
+        console.error("Error loading optimized catalog:", err);
       } finally {
         setLoading(false);
       }
     };
-    fetchInitialProducts();
+    fetchGroupedCatalog();
   }, []);
 
-  // 2. INFINITE STREAM ROUTINE: Fetches subsequent light records safely without locking up browser cycles
-  const loadMoreProducts = useCallback(async () => {
-    if (fetchingMore || !hasMore) return;
-    setFetchingMore(true);
-    const nextPage = page + 1;
-
-    try {
-      const res = await rateLimitedRequest(() => 
-        axios.get(`${API_ENDPOINTS.SHOPPING.PRODUCTS}?page=${nextPage}&limit=8`)
-      );
-      
-      const newProducts = res.data.products || [];
-      if (newProducts.length > 0) {
-        setProducts(prev => [...prev, ...newProducts]); 
-        setPage(nextPage);
-        setHasMore(nextPage < (res.data.pagination?.pages || 1));
-      } else {
-        setHasMore(false);
-      }
-    } catch (err) {
-      console.error("Error fetching more items:", err);
-    } finally {
-      setFetchingMore(false);
-    }
-  }, [page, fetchingMore, hasMore]);
-
-  // 3. EVENT TRACKER APIS: Monitors infinite layout bounds via highly efficient boundary margins
-  useEffect(() => {
-    const observerElement = observerTargetRef.current;
-    if (!observerElement || !hasMore || loading) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && !fetchingMore) {
-          loadMoreProducts();
-        }
-      },
-      { 
-        rootMargin: '250px 0px', // Requests the next dataset 250px early to support frictionless scrolling
-        threshold: 0.01 
-      } 
-    );
-
-    observer.observe(observerElement);
-    return () => {
-      if (observerElement) observer.unobserve(observerElement);
-    };
-  }, [hasMore, loading, fetchingMore, loadMoreProducts]);
-
-  // 4. MEMOIZED DICTIONARY CACHE: Prevents rendering layout stutter by freezing processed category arrays
+  // 2. SEARCH MEMO FILTER: Filters client arrays efficiently without recalculation lag
   const sortedCategoryEntries = useMemo(() => {
     const query = (searchQuery || "").toLowerCase().trim();
-    const productArray = Array.isArray(products) ? products : [];
+    if (!query) return catalog; 
 
-    const filtered = productArray.filter(p => {
-      const name = p.name || "";
-      return name.toLowerCase().includes(query);
-    });
+    return catalog.map(([category, items]) => {
+      const filteredItems = items.filter(item => 
+        (item.name || "").toLowerCase().includes(query)
+      );
+      return [category, filteredItems];
+    }).filter(([_, items]) => items.length > 0); 
+  }, [catalog, searchQuery]);
 
-    const grouped = filtered.reduce((acc, product) => {
-      const category = product.category || "Uncategorized";
-      if (!acc[category]) acc[category] = [];
-      acc[category].push(product);
-      return acc;
-    }, {});
-
-    return Object.entries(grouped).sort(([a], [b]) => {
-      if (a === 'Console') return -1;
-      if (b === 'Console') return 1;
-      return a.localeCompare(b);
-    });
-  }, [products, searchQuery]);
-
-  // EFFECT 1: Instantly repositions display grids on clean keyword tracking executions
+  // EFFECT 1: Snap view focus into position upon query updates
   useEffect(() => {
     if (loading || !searchQuery.trim()) return;
     const timer = setTimeout(() => {
@@ -134,7 +67,7 @@ const ShoppingSection = ({ searchQuery = "" }) => {
     return () => clearTimeout(timer);
   }, [searchQuery, loading]);
 
-  // EFFECT 2: Seamlessly glides users to chosen menu headers across dynamic mobile viewports
+  // EFFECT 2: Smooth scroll into targeted item lists
   useEffect(() => {
     if (loading) return;
     const hasCategoryChanged = previousCategoryRef.current !== activeCategory;
@@ -152,7 +85,6 @@ const ShoppingSection = ({ searchQuery = "" }) => {
     }
   }, [activeCategory, loading]);
 
-  // Rendering fallback loaders 
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center py-32 space-y-3 transition-colors duration-300 dark:bg-black">
@@ -173,16 +105,13 @@ const ShoppingSection = ({ searchQuery = "" }) => {
         const isHighlighted = activeCategory && String(activeCategory).toLowerCase() === String(category).toLowerCase();
 
         return (
-          /* PERFORMANCE FIX 1: Modern CSS Layout Containment
-             Tells the browser engine to skip layout & paint calculations for this whole category
-             block when it is outside the viewport bounds, drastically lowering TBT. */
           <div 
             key={category} 
             id={sectionId} 
             className="w-full space-y-2 px-4 will-change-[content-visibility]"
             style={{
               contentVisibility: 'auto',
-              containIntrinsicSize: '0 340px' // Reserves an estimated height block to stop scrollbar jumping
+              containIntrinsicSize: '0 340px' 
             }}
           >
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 dark:border-border">
@@ -202,11 +131,6 @@ const ShoppingSection = ({ searchQuery = "" }) => {
                   
                   <Link href={`/product/${item.id}`} className="block relative">
                     <div className="relative aspect-4/3 w-full bg-slate-50/50 flex items-center justify-center overflow-hidden dark:bg-black">
-                      
-                      {/* PERFORMANCE FIX 2: Fixed Image Loading Strategy
-                          - Replaced 'priority={true}' with conditional priority (only the absolute first card of the first row gets loaded immediately).
-                          - Removed 'unoptimized' to let Next.js compress assets to modern WebP formats.
-                          - Added blur placeholders to maintain visual fluidity on slower mobile networks. */}
                       <Image 
                         loader={localImageLoader}
                         src={getImageUrl(item.image_url)} 
@@ -260,22 +184,11 @@ const ShoppingSection = ({ searchQuery = "" }) => {
         );
       })}
 
-      {/* INFINITE SCROLL LOADER ANCHOR TARGET */}
-      <div ref={observerTargetRef} className="w-full py-6 flex justify-center items-center">
-        {fetchingMore && (
-          <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-semibold text-xs uppercase tracking-wider">
-            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            <span>Loading More Gear...</span>
-          </div>
-        )}
-        {!fetchingMore && !hasMore && (
-          <p className="text-slate-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
-            Done
-          </p>
-        )}
+      {/* FOOTER SUMMARY NOTIFICATION */}
+      <div className="w-full py-6 flex justify-center items-center">
+        <p className="text-slate-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
+          All Products Loaded Successfully
+        </p>
       </div>
 
       <style dangerouslySetInnerHTML={{__html: `

@@ -11,18 +11,11 @@ const HeroSection = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isMobile, setIsMobile] = useState(false); 
   const [hasMounted, setHasMounted] = useState(false);
 
-  // SAFE WINDOW TRACKER (Runs strictly after browser initialization)
+  // SAFE MOUNT TRACKER (Runs strictly once after browser initialization)
   useEffect(() => {
     setHasMounted(true);
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth <= 768);
-    };
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   // FETCH HERO DATA
@@ -52,8 +45,7 @@ const HeroSection = () => {
     }
   }, [offers]);
 
-  // FIX 1: HIGH PERFORMANCE SKELETON PLACEHOLDER
-  // Keeps layout layout shifts under control while matching global style footprints
+  // HIGH PERFORMANCE SKELETON PLACEHOLDER
   if (!hasMounted || loading) {
     return (
       <div className="w-full h-[50vh] min-h-[400px] bg-slate-100 flex items-center px-6">
@@ -80,8 +72,7 @@ const HeroSection = () => {
         {offers.map((product, index) => {
           const isCurrent = index === currentIndex;
           
-          // FIX 2: Only allow the active image or its nearest neighbor to stay in DOM
-          // This keeps the browser from wasting network assets on off-screen components
+          // Only render the active image, the previous slide, or the next slide to keep DOM footprint ultra-thin
           if (Math.abs(index - currentIndex) > 1 && index !== offers.length - 1 && index !== 0) {
             return null;
           }
@@ -89,35 +80,23 @@ const HeroSection = () => {
           return (
             <div
               key={product.id}
-              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out transform-gpu will-change-transform ${
                 isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
+              {/* PERFORMANCE FIX: Replaced all JavaScript screen-size checking variables 
+                  with responsive utility class arrays. Mobile loads clean, desktop clips dynamically. */}
               <div 
-                className="absolute inset-0 md:left-1/3 h-full w-full md:w-2/3 ml-auto"
-                style={{
-                  clipPath: !isMobile ? 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' : 'none'
-                }}
+                className="absolute inset-0 md:left-1/3 h-full w-full md:w-2/3 ml-auto [clip-path:none] md:[clip-path:polygon(15%_0,_100%_0,_100%_100%,_0%_100%)]"
               >
-                {/* FIX 3: Fully Supercharged Core Web Vitals Image Logic */}
                 <Image
                   loader={localImageLoader}
                   src={getImageUrl(product.image_url)}
                   alt={product.name}
                   fill 
-                  // REASON FOR SIZES CHANGE: Communicates exact width needs to browser viewport maps.
-                  // Desktop takes up roughly 66% width space (w-2/3 ml-auto), Mobile scales to full.
                   sizes="(max-w-768px) 100vw, 66vw" 
-                  
-                  // REASON FOR REMOVING unoptimized: Allows Next.js asset-pipelines to compress image weight 
-                  // into next-gen formatting formats (AVIF/WebP) dynamically.
-                  
-                  // REASON FOR CONDITIONAL PRIORITY: Forces the first initial element slide
-                  // to stream over the pipeline immediately with an extreme download priority weight.
                   priority={index === 0} 
                   fetchpriority={index === 0 ? "high" : "low"}
-                  
-                  // Prevent CPU pipeline bottlenecks when painting layout swaps
                   decoding="async"
                   className="object-cover" 
                 />                
