@@ -1,6 +1,6 @@
 "use client"; // 🚀 CRUCIAL: Enables state, hooks, and browser APIs in Next.js
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS, getImageUrl } from '../../config/api';
 import ProductForm from './ProductForm';
@@ -36,10 +36,20 @@ const ProductManager = ({ search = '' }) => {
     fetchProducts();
   }, []);
 
+  // ADMINISTRATIVE FIX: Parses the newly optimization-grouped categoric arrays
+  // and flattens them cleanly for table inventory lists
   const fetchProducts = async () => {
     try {
       const res = await axios.get(API_URL);
-      setProducts(res.data.products || []);
+      const catalogData = res.data.catalog || [];
+      
+      // Flatten out the [category, items] matrices back into a direct plain array map
+      const flattenedProducts = catalogData.flatMap(([_, items]) => items);
+      
+      // Maintain chronological list formatting (id ASC) inside your panel list
+      const chronologicallySorted = [...flattenedProducts].sort((a, b) => a.id - b.id);
+      
+      setProducts(chronologicallySorted);
     } catch (err) {
       console.error("Error fetching inventory data:", err);
     }
@@ -48,7 +58,6 @@ const ProductManager = ({ search = '' }) => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Safe to use here because execution is tied entirely to a browser click event
       setImagePreview(URL.createObjectURL(file));
       setFormData(prev => ({ ...prev, image_file: file }));
     }
@@ -59,8 +68,6 @@ const ProductManager = ({ search = '' }) => {
     setLoading(true);
 
     const activeFormData = directData || formData;
-
-    // Next.js Guard: Ensure localStorage is read safely in the browser environment
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     const data = new FormData();
     
@@ -208,7 +215,6 @@ const ProductManager = ({ search = '' }) => {
   };
 
   const handleDelete = async (id) => {
-    // Next.js Guard: Avoid triggering window dialog methods during unexpected server pre-renders
     if (typeof window === 'undefined') return;
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     
@@ -222,9 +228,14 @@ const ProductManager = ({ search = '' }) => {
     }
   };
 
-  const filteredProducts = products.filter(product =>
-    product.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // PERFORMANCE PERFORMANCE CACHE: Stops text filtering from dropping mobile input frame rates
+  const filteredProducts = useMemo(() => {
+    const query = search.toLowerCase().trim();
+    if (!query) return products;
+    return products.filter(product =>
+      (product.name || '').toLowerCase().includes(query)
+    );
+  }, [products, search]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8 font-sans">
