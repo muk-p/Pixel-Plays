@@ -213,13 +213,6 @@ const ShoppingSection = ({ searchQuery = "" }) => {
         );
       })}
 
-      {/* FOOTER SUMMARY NOTIFICATION */}
-      <div className="w-full py-6 flex justify-center items-center">
-        <p className="text-slate-400 dark:text-zinc-500 text-[10px] font-bold uppercase tracking-widest">
-          All Products Loaded Successfully
-        </p>
-      </div>
-
       <style dangerouslySetInnerHTML={{__html: `
         .scrollbar-hide::-webkit-scrollbar { display: none; }
         .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
