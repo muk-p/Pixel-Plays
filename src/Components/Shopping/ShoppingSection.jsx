@@ -1,11 +1,14 @@
 "use client"; // Required for useState, useEffect, useRef, and search query parameters
 
-import Link from 'next/link';
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import Link from 'next/link'; // <--- THIS SCRIPT FIXES THE REFERENCE ERROR
 import { useSearchParams } from 'next/navigation'; 
 import axios from 'axios';
-import { API_ENDPOINTS } from '../../config/api';
-  import { rateLimitedRequest } from '@/utils/rateLimiter';
+import { API_ENDPOINTS, getImageUrl } from '../../config/api';
+import Image from 'next/image'; 
+import { rateLimitedRequest } from '@/utils/rateLimiter';
+import localImageLoader from '@/config/ImageLoader'; 
+
 
 const formatCategoryId = (categoryId) =>
   String(categoryId || '')
