@@ -43,17 +43,46 @@ const ShoppingSection = ({ searchQuery = "" }) => {
     fetchGroupedCatalog();
   }, []);
 
-  // 2. SEARCH MEMO FILTER: Filters client arrays efficiently without recalculation lag
+  // 2. CHRONOLOGICAL SEARCH & DICTIONARY SORT MEMO FILTER
+  // Sorts incoming entries based explicitly on your strict category map weights
   const sortedCategoryEntries = useMemo(() => {
     const query = (searchQuery || "").toLowerCase().trim();
-    if (!query) return catalog; 
+    
+    // Explicit sort priority dictionary matching your icons array exactly
+    const categorySortOrder = {
+      'Console': 1,
+      'Accessories': 2,
+      'Phones': 3,
+      'TVs': 4,
+      'Digital': 5,
+      'Pre-owned': 6,
+      'VR Gear': 7,
+      'Merch': 8
+    };
 
-    return catalog.map(([category, items]) => {
-      const filteredItems = items.filter(item => 
-        (item.name || "").toLowerCase().includes(query)
-      );
-      return [category, filteredItems];
-    }).filter(([_, items]) => items.length > 0); 
+    // If search is empty, pass pre-grouped array instantly sorted by dictionary weight
+    if (!query) {
+      return [...catalog].sort(([a], [b]) => {
+        const orderA = categorySortOrder[a] || 99;
+        const orderB = categorySortOrder[b] || 99;
+        return orderA - orderB;
+      });
+    } 
+
+    // Filter sub-arrays based on query and keep them strictly organized by dictionary index
+    return catalog
+      .map(([category, items]) => {
+        const filteredItems = items.filter(item => 
+          (item.name || "").toLowerCase().includes(query)
+        );
+        return [category, filteredItems];
+      })
+      .filter(([_, items]) => items.length > 0)
+      .sort(([a], [b]) => {
+        const orderA = categorySortOrder[a] || 99;
+        const orderB = categorySortOrder[b] || 99;
+        return orderA - orderB;
+      });
   }, [catalog, searchQuery]);
 
   // EFFECT 1: Snap view focus into position upon query updates
