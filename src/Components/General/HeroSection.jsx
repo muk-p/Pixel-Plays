@@ -11,26 +11,21 @@ const HeroSection = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  // 1. FIXED: Default state to false for SSR stability.
-  // Do not execute window math directly inside the declaration.
   const [isMobile, setIsMobile] = useState(false); 
-  const [hasMounted, setHasMounted] = useState(false); // New anchor point state
+  const [hasMounted, setHasMounted] = useState(false);
 
-  // 2. SAFE WINDOW TRACKER (Runs strictly after browser initialization)
+  // SAFE WINDOW TRACKER (Runs strictly after browser initialization)
   useEffect(() => {
-    setHasMounted(true); // Signal that the component is safely rendered in the browser
-    
+    setHasMounted(true);
     const checkScreenSize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
-    
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // 3. FETCH HERO DATA
+  // FETCH HERO DATA
   useEffect(() => {
     const fetchHeroOffers = async () => {
       try {
@@ -47,7 +42,7 @@ const HeroSection = () => {
     fetchHeroOffers();
   }, []);
 
-  // 4. AUTOMATIC SLIDER TIMER
+  // AUTOMATIC SLIDER TIMER
   useEffect(() => {
     if (offers.length > 1) {
       const timer = setInterval(() => {
@@ -57,10 +52,11 @@ const HeroSection = () => {
     }
   }, [offers]);
 
-  // 5. PREVENT SSR DELTAS (Returns uniform placeholder layout until browser calculations finish)
+  // FIX 1: HIGH PERFORMANCE SKELETON PLACEHOLDER
+  // Keeps layout layout shifts under control while matching global style footprints
   if (!hasMounted || loading) {
     return (
-      <div className="w-full h-[50vh] min-h-[400px] bg-slate-100 animate-pulse flex items-center px-6">
+      <div className="w-full h-[50vh] min-h-[400px] bg-slate-100 flex items-center px-6">
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <div className="h-4 w-24 bg-slate-200 rounded" />
@@ -79,10 +75,17 @@ const HeroSection = () => {
   return (
     <section className="relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-(--surface-alt) border-b border-(--border)">
       
-      {/* BACKGROUND IMAGES WITH NATIVE LAZY/EAGER STRATEGY */}
+      {/* BACKGROUND IMAGES WITH STRATEGIC OPTIMIZATIONS */}
       <div className="absolute inset-0 z-0">
         {offers.map((product, index) => {
           const isCurrent = index === currentIndex;
+          
+          // FIX 2: Only allow the active image or its nearest neighbor to stay in DOM
+          // This keeps the browser from wasting network assets on off-screen components
+          if (Math.abs(index - currentIndex) > 1 && index !== offers.length - 1 && index !== 0) {
+            return null;
+          }
+
           return (
             <div
               key={product.id}
@@ -96,18 +99,28 @@ const HeroSection = () => {
                   clipPath: !isMobile ? 'polygon(15% 0, 100% 0, 100% 100%, 0% 100%)' : 'none'
                 }}
               >
-              <Image
-                loader={localImageLoader}
-                src={getImageUrl(product.image_url)}
-                loading="eager"
-                alt={product.name}
-                fill /* Lowercase 'fill' tells Next.js to expand into the parent container box */
-                sizes="(max-w-768px) 50vw, 300px" /* Optimizes image rendering size across devices */
-                unoptimized
-                priority={index === 0} /* Modern Next.js version of eager loading */
-                decoding="async"
-                className="object-cover" /* Next.js manages w-full/h-full automatically under fill mode */
-              />                
+                {/* FIX 3: Fully Supercharged Core Web Vitals Image Logic */}
+                <Image
+                  loader={localImageLoader}
+                  src={getImageUrl(product.image_url)}
+                  alt={product.name}
+                  fill 
+                  // REASON FOR SIZES CHANGE: Communicates exact width needs to browser viewport maps.
+                  // Desktop takes up roughly 66% width space (w-2/3 ml-auto), Mobile scales to full.
+                  sizes="(max-w-768px) 100vw, 66vw" 
+                  
+                  // REASON FOR REMOVING unoptimized: Allows Next.js asset-pipelines to compress image weight 
+                  // into next-gen formatting formats (AVIF/WebP) dynamically.
+                  
+                  // REASON FOR CONDITIONAL PRIORITY: Forces the first initial element slide
+                  // to stream over the pipeline immediately with an extreme download priority weight.
+                  priority={index === 0} 
+                  fetchpriority={index === 0 ? "high" : "low"}
+                  
+                  // Prevent CPU pipeline bottlenecks when painting layout swaps
+                  decoding="async"
+                  className="object-cover" 
+                />                
                 {/* Mobile gradient overlay */}
                 <div className="md:hidden absolute inset-0 bg-gradient-to-r from-white via-white/40 to-transparent" />
               </div>
