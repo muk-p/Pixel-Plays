@@ -14,6 +14,7 @@ const API_ENDPOINTS = {
   // Shopping
   SHOPPING: {
     PRODUCTS: `${API_BASE_URL}/api/shopping/products`,
+    HERO: `${API_BASE_URL}/api/shopping/products/hero-offers`,
     ORDERS: `${API_BASE_URL}/api/shopping/orders`,
     STATS: `${API_BASE_URL}/api/shopping/stats`,
     CHECKOUT: `${API_BASE_URL}/api/shopping/checkout`,

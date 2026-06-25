@@ -22,10 +22,9 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchHeroOffers = async () => {
       try {
-        const res = await axios.get(API_ENDPOINTS.SHOPPING.PRODUCTS);
-        const selectedHeroItems = (res.data.products || [])
-          .filter(product => product.is_hero === true || product.is_hero === 1);
-        setOffers(selectedHeroItems);
+        // PERFORMANCE FIX: Hits the new micro-payload endpoint instead of loading the entire catalog
+        const res = await axios.get(API_ENDPOINTS.SHOPPING.HERO);
+        setOffers(res.data.products || []);
       } catch (err) {
         console.error('Hero Fetch Error:', err);
       } finally {
