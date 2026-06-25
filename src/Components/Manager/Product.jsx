@@ -116,21 +116,19 @@ const ProductManager = ({ search = '' }) => {
     if (product) {
       let activeProduct = { ...product };
 
-      const isShallowData = 
-        (!activeProduct.features || activeProduct.features.length === 0) && 
-        (!activeProduct.specs || Object.keys(activeProduct.specs).length === 0);
-
-      if (isShallowData) {
-        try {
-          setLoading(true);
-          const res = await axios.get(`${API_URL}/${product.id}`);
-          activeProduct = res.data.product || res.data;
-        } catch (err) {
-          console.error("Failed to load deep single product profile info:", err);
-          alert("Could not load rich specifications. Editing raw base product.");
-        } finally {
-          setLoading(false);
-        }
+      // SYSTEM FIX: Remove conditional guards to force a deep API fetch 
+      // from the single-item (/:id) endpoint every time an item is opened for editing.
+      try {
+        setLoading(true);
+        const res = await axios.get(`${API_URL}/${product.id}`);
+        
+        // Dynamic fallback extracts data whether backend responds with { product } or direct object
+        activeProduct = res.data.product || res.data;
+      } catch (err) {
+        console.error("Failed to load deep single product profile info:", err);
+        alert("Could not load rich specifications. Editing raw base product from memory cache.");
+      } finally {
+        setLoading(false);
       }
 
       let parsedFeatures = [];
@@ -138,7 +136,7 @@ const ProductManager = ({ search = '' }) => {
 
       try {
         parsedFeatures = typeof activeProduct.features === 'string' 
-          ? JSON.parse(activeProduct.features) 
+          ? JSON.parse(activeProduct.features || '[]') 
           : (activeProduct.features || []);
       } catch (e) {
         console.warn("Failed to parse product features field:", e);
@@ -147,16 +145,18 @@ const ProductManager = ({ search = '' }) => {
 
       try {
         parsedSpecs = typeof activeProduct.specs === 'string' 
-          ? JSON.parse(activeProduct.specs) 
+          ? JSON.parse(activeProduct.specs || '{}') 
           : (activeProduct.specs || {});
       } catch (e) {
         console.warn("Failed to parse product specs field:", e);
         parsedSpecs = {};
       }
 
+      // Populate form data parameters, explicitly guaranteeing string fallbacks for the description field
       setFormData({
         ...initialFormState,
         ...activeProduct,
+        description: activeProduct.description || '', // Safe fallback keeps textarea running cleanly
         features: parsedFeatures,
         specs: parsedSpecs,
         image_file: null 
