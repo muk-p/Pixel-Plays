@@ -70,8 +70,26 @@ const ProductForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmitIntercept} className="bg-white rounded-4xl p-5 md:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-300">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+    <form 
+      onSubmit={handleSubmitIntercept} 
+      // CRUCIAL ADDITION: Catches clipboard image paste actions anywhere inside the form window
+      onPaste={(e) => {
+        const items = e.clipboardData?.items;
+        if (!items) return;
+
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            if (file) {
+              // 1. Update the frontend visual preview box immediately
+              handleImageChange({ target: { files: [file] } });
+            }
+          }
+        }
+      }}
+      className="bg-white rounded-4xl p-5 md:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
+    >
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
         
         {/* Left Side: Image Upload & Long-form Description Layout */}
         <div className="flex flex-col gap-6">

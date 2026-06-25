@@ -56,7 +56,8 @@ const ProductManager = ({ search = '' }) => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    // SYSTEM FIX: Safely selects index 0 from either standard clicks or custom clipboard triggers
+    const file = e.target?.files?.[0] || e.target?.files?.[0] || e.files?.[0];
     if (file) {
       setImagePreview(URL.createObjectURL(file));
       setFormData(prev => ({ ...prev, image_file: file }));
