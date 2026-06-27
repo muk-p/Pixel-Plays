@@ -4,8 +4,13 @@ import path from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
-const BACKEND_HOSTNAME = process.env.NEXT_PUBLIC_API_HOSTNAME || 'localhost';
+// 1. Get raw environment variables with hardcoded safe production fallbacks
+const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'https://railway.app';
+const rawHostname = process.env.NEXT_PUBLIC_API_HOSTNAME || 'backend-production-9c30.up.railway.app';
+
+// 2. SANITIZATION LAYER: Safely strips trailing slashes to prevent broken double slashes (//api) in your code
+const BACKEND_URL = rawApiUrl.endsWith('/') ? rawApiUrl.slice(0, -1) : rawApiUrl;
+const BACKEND_HOSTNAME = rawHostname.replace(/^https?:\/\//, '').split('/')[0];
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -14,11 +19,13 @@ const nextConfig = {
   images: {
     dangerouslyAllowSVG: true,
     remotePatterns: [
+      // Clean, dynamic server production image pattern
       {
-        protocol: 'https', // Changed to https for your live server security
+        protocol: 'https',
         hostname: BACKEND_HOSTNAME,
         pathname: '/**', 
       },
+      // Local development asset loading backup
       {
         protocol: 'http',
         hostname: 'localhost',
@@ -28,6 +35,7 @@ const nextConfig = {
     ],
   },
   
+  // Proxies frontend request traffic safely from /api over to your true Railway database server
   async rewrites() {
     return [
       {

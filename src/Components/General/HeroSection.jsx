@@ -12,8 +12,12 @@ const HeroSection = () => {
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
+  
+  // Tracking states for touch coordinates
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
 
-  // SAFE MOUNT TRACKER (Runs strictly once after browser initialization)
+  // SAFE MOUNT TRACKER
   useEffect(() => {
     setHasMounted(true);
   }, []);
@@ -22,7 +26,6 @@ const HeroSection = () => {
   useEffect(() => {
     const fetchHeroOffers = async () => {
       try {
-        // PERFORMANCE FIX: Hits the new micro-payload endpoint instead of loading the entire catalog
         const res = await axios.get(API_ENDPOINTS.SHOPPING.HERO);
         setOffers(res.data.products || []);
       } catch (err) {
@@ -38,11 +41,46 @@ const HeroSection = () => {
   useEffect(() => {
     if (offers.length > 1) {
       const timer = setInterval(() => {
-        setCurrentIndex((prev) => (prev === offers.length - 1 ? 0 : prev + 1));
+        handleNext();
       }, 5000);
       return () => clearInterval(timer);
     }
   }, [offers]);
+
+  // Directional navigation methods
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev === 0 ? offers.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === offers.length - 1 ? 0 : prev + 1));
+  };
+
+  // TOUCH / SWIPE LIFECYCLE HANDLERS
+  const minSwipeDistance = 50; // Minimum swipe movement required in pixels
+
+  const handleTouchStart = (e) => {
+    setTouchEnd(null); // Reset before tracking new swipe
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      handleNext();
+    } else if (isRightSwipe) {
+      handlePrev();
+    }
+  };
 
   // HIGH PERFORMANCE SKELETON PLACEHOLDER
   if (!hasMounted || loading) {
@@ -64,14 +102,18 @@ const HeroSection = () => {
   const current = offers[currentIndex];
 
   return (
-    <section className="relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-(--surface-alt) border-b border-(--border)">
+    <section 
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-(--surface-alt) border-b border-(--border) group/section select-none touch-pan-y"
+    >
       
-      {/* BACKGROUND IMAGES WITH STRATEGIC OPTIMIZATIONS */}
-      <div className="absolute inset-0 z-0">
+      {/* BACKGROUND IMAGES */}
+      <div className="absolute inset-0 z-0 pointer-events-none">
         {offers.map((product, index) => {
           const isCurrent = index === currentIndex;
           
-          // Only render the active image, the previous slide, or the next slide to keep DOM footprint ultra-thin
           if (Math.abs(index - currentIndex) > 1 && index !== offers.length - 1 && index !== 0) {
             return null;
           }
@@ -83,8 +125,6 @@ const HeroSection = () => {
                 isCurrent ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
-              {/* PERFORMANCE FIX: Replaced all JavaScript screen-size checking variables 
-                  with responsive utility class arrays. Mobile loads clean, desktop clips dynamically. */}
               <div 
                 className="absolute inset-0 md:left-1/3 h-full w-full md:w-2/3 ml-auto [clip-path:none] md:[clip-path:polygon(15%_0,_100%_0,_100%_100%,_0%_100%)]"
               >
@@ -99,7 +139,6 @@ const HeroSection = () => {
                   decoding="async"
                   className="object-cover" 
                 />                
-                {/* Mobile gradient overlay */}
                 <div className="md:hidden absolute inset-0 bg-gradient-to-r from-white via-white/40 to-transparent" />
               </div>
             </div>
@@ -108,8 +147,8 @@ const HeroSection = () => {
       </div>
 
       {/* CONTENT LAYER */}
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-6 flex items-center">
-        <div className="w-full md:w-1/2 text-left">
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-6 flex items-center pointer-events-none">
+        <div className="w-full md:w-1/2 text-left pointer-events-auto">
           <div className="animate-fadeIn">
             <span className="block font-bold tracking-widest uppercase text-[10px] md:text-xs mb-2 text-indigo-600">
               New arrivals
@@ -146,6 +185,33 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
+
+      {/* DIRECTIONAL NAV BUTTONS (Hidden on mobile screens to prevent touch dead zones) */}
+      {offers.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={handlePrev}
+            className="hidden md:flex absolute left-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center rounded-full bg-white/70 hover:bg-white text-gray-800 shadow-md backdrop-blur-sm opacity-0 group-hover/section:opacity-100 transition-all active:scale-95 duration-300"
+            aria-label="Previous slide"
+          >
+            <svg xmlns="http://w3.org" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            onClick={handleNext}
+            className="hidden md:flex absolute right-4 top-1/2 -translate-y-1/2 z-30 w-12 h-12 items-center justify-center rounded-full bg-white/70 hover:bg-white text-gray-800 shadow-md backdrop-blur-sm opacity-0 group-hover/section:opacity-100 transition-all active:scale-95 duration-300"
+            aria-label="Next slide"
+          >
+            <svg xmlns="http://w3.org" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </>
+      )}
 
       {/* PROGRESS INDICATORS */}
       <div className="absolute bottom-4 left-1/2 md:left-6 -translate-x-1/2 md:translate-x-0 z-30 flex gap-1.5">
