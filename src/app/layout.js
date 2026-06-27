@@ -1,14 +1,14 @@
 import ClientAppShell from './ClientAppShell';
 import './globals.css';
 
-// Fixed: Falls back to local localhost address if environment variable isn't set yet
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
+// Streamlined: Safe production fallback mirroring your individual page variables
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pixelplays.co.ke';
 
 export const metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     default: 'PixelPlays | Buy PS5, Xbox & Nintendo in Kenya',
-    template: '%s | PixelPlayss',
+    template: '%s | PixelPlays',
   },
   description:
     'Shop authentic PlayStation, Xbox, and Nintendo consoles plus gaming accessories in Kenya with fast door-to-door delivery and secure M-Pesa checkout.',
@@ -35,7 +35,7 @@ export const metadata = {
       'Authentic consoles, accessories, and gaming gear in Kenya with fast door-to-door delivery and M-Pesa checkout.',
     images: [
       {
-        url: '/og-image.png', // Best practice: OpenGraph images should be 1200x630 (not your tiny favicon)
+        url: '/og-image.png',
         width: 1200,
         height: 630,
         alt: 'PixelPlays gaming consoles and accessories in Kenya',
@@ -48,7 +48,7 @@ export const metadata = {
     description:
       'Shop authentic consoles and accessories in Kenya with fast delivery and secure payments.',
     images: ['/og-image.png'],
-    creator: '@gadgetfinds',
+    creator: '@pixelplays',
   },
 };
 
@@ -59,7 +59,7 @@ export const viewport = {
   viewportFit: 'cover',
   themeColor: [
     { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#4f46e5' }, // Matching your indigo brand theme color
+    { media: '(prefers-color-scheme: dark)', color: '#4f46e5' },
   ],
 };
 

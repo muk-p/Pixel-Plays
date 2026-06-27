@@ -1,12 +1,21 @@
 export default function robots() {
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pixelplays.co.ke';
+
   return {
     rules: [
       {
         userAgent: '*',
-        allow: ['/'],
-        disallow: ['/cart', '/checkout', '/api', '/manager', '/login', '/signup'],
+        allow: '/',
+        disallow: [
+          '/cart', 
+          '/checkout', 
+          '/api', 
+          '/manager', 
+          '/login', 
+          '/signup'
+        ],
       },
     ],
-    sitemap: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://pixel-plays-iota.vercel.app' }/sitemap.xml`,
+    sitemap: `${baseUrl}/sitemap.xml`,
   };
 }
