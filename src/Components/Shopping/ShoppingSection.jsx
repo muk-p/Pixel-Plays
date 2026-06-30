@@ -128,6 +128,12 @@ return (
       className="w-full max-w-full space-y-14 py-8 overflow-visible bg-slate-50/30 scroll-mt-16 transition-colors duration-300 dark:bg-background" 
     >
       {sortedCategoryEntries.map(([category, items], categoryIndex) => {
+        // 👈 NEW CONDITIONAL FILTERING ENGINE:
+        // If a specific category parameter is active in the URL, hide all other categories completely
+        if (activeCategory && String(activeCategory).toLowerCase().trim() !== String(category).toLowerCase().trim()) {
+          return null; 
+        }
+
         const sectionId = `category-${formatCategoryId(category)}`;
         const isHighlighted = activeCategory && String(activeCategory).toLowerCase() === String(category).toLowerCase();
 
@@ -151,8 +157,8 @@ return (
               
               {/* CLICK INTERCEPTOR WRAPPER: Selecting this updates parameters and isolates layout smoothly */}
               <Link 
-                href={`/shop?category=${category}`} 
-                scroll={false} 
+                href={`/shop?category=${encodeURIComponent(category)}`} // 👈 Wrapped in encodeURIComponent to safely handle categories with spaces like 'VR Gear' or 'Pre-owned'
+                scroll={true} // 👈 Force true to snap users back to the top of the newly filtered single row view
                 className="inline-block transition-transform hover:scale-105 active:scale-95"
               >
                 <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full dark:bg-(--surface-alt) dark:text-(--muted) hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-400 cursor-pointer transition-colors">
@@ -162,13 +168,13 @@ return (
             </div>
             
             {/* HORIZONTAL TOUCH RUNNER SCROLL ROW */}
+            {/* 💡 Note: If a single category is isolated, you could also switch 'flex overflow-x-auto' to 'grid grid-cols-2 md:grid-cols-4 gap-4' to make it a clean static layout block instead of a side-scrolling list card strip! */}
             <div className="w-full flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
               {items.map((item, itemIndex) => (
                 <div 
-                  key={item.slug || item.id} // 👈 1. Updated item key to prioritize unique slug fields
+                  key={item.slug || item.id} 
                   className="group flex flex-col shrink-0 w-[calc(50%-8px)] md:w-52 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200/80 transition-all duration-300 overflow-hidden snap-start dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-800 dark:shadow-none"
                 >
-                  {/* 👈 2. Updated target image wrapper routing link to point to item.slug */}
                   <Link href={`/product/${item.slug}`} className="block relative">
                     {/* ASSET CANVAS CONTAINER CONTAINER */}
                     <div className="relative aspect-[4/3] w-full bg-slate-50/50 flex items-center justify-center overflow-hidden dark:bg-black">
@@ -213,7 +219,7 @@ return (
                   {/* BOTTOM CTAS HOVER INTERACTIVE ACTIONS BLOCK */}
                   <div className="p-3 md:p-3.5 pt-0 mt-auto">
                     <Link
-                      href={`/product/${item.slug}`} // 👈 3. Verified button routing link targets item.slug
+                      href={`/product/${item.slug}`} 
                       className={`block w-full py-2 rounded-xl text-center text-[11px] md:text-xs font-bold tracking-wide transition-all active:scale-98 border ${
                         item.stock > 0
                           ? 'bg-slate-900 border-slate-900 text-white hover:bg-indigo-600 hover:border-indigo-600 shadow-sm shadow-slate-200 dark:bg-white dark:border-white dark:text-black dark:hover:bg-zinc-200 dark:shadow-none'
