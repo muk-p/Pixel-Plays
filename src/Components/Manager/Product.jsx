@@ -15,6 +15,7 @@ const ProductManager = ({ search = '' }) => {
   
   const initialFormState = { 
     id: null,
+    slug: '', // 👈 1. Added slug support to state properties initialization block
     name: '', 
     brand: '', 
     category: '',
@@ -46,17 +47,19 @@ const ProductManager = ({ search = '' }) => {
       // Flatten out the [category, items] matrices back into a direct plain array map
       const flattenedProducts = catalogData.flatMap(([_, items]) => items);
       
-      // Maintain chronological list formatting (id ASC) inside your panel list
-      const chronologicallySorted = [...flattenedProducts].sort((a, b) => a.id - b.id);
+      // Updated chronological fallbacks to use slug text matrices safely if id fields alter
+      const sortedCatalog = [...flattenedProducts].sort((a, b) => {
+        if (a.slug && b.slug) return a.slug.localeCompare(b.slug);
+        return a.id - b.id;
+      });
       
-      setProducts(chronologicallySorted);
+      setProducts(sortedCatalog);
     } catch (err) {
       console.error("Error fetching inventory data:", err);
     }
   };
 
   const handleImageChange = (e) => {
-    // SYSTEM FIX: Safely selects index 0 from either standard clicks or custom clipboard triggers
     const file = e.target?.files?.[0] || e.target?.files?.[0] || e.files?.[0];
     if (file) {
       setImagePreview(URL.createObjectURL(file));
@@ -73,7 +76,7 @@ const ProductManager = ({ search = '' }) => {
     const data = new FormData();
     
     Object.keys(activeFormData).forEach(key => {
-      if (key === 'id') return;
+      if (key === 'id') return; // Pass slug values instead of primary keys
       
       if (key === 'image_file') {
         if (activeFormData.image_file) {
@@ -98,8 +101,10 @@ const ProductManager = ({ search = '' }) => {
         }
       };
 
-      if (activeFormData.id) {
-        await axios.put(`${API_URL}/${activeFormData.id}`, data, config);
+      // 👈 2. Updated PUT request parameters to use the active product's slug string
+      if (activeFormData.id || activeFormData.slug) {
+        const identifier = activeFormData.slug || activeFormData.id;
+        await axios.put(`${API_URL}/${identifier}`, data, config);
       } else {
         await axios.post(API_URL, data, config);
       }
@@ -117,13 +122,12 @@ const ProductManager = ({ search = '' }) => {
     if (product) {
       let activeProduct = { ...product };
 
-      // SYSTEM FIX: Remove conditional guards to force a deep API fetch 
-      // from the single-item (/:id) endpoint every time an item is opened for editing.
       try {
         setLoading(true);
-        const res = await axios.get(`${API_URL}/${product.id}`);
+        // 👈 3. Updated dynamic deep-fetch endpoint path parameters to use slug targeting strings
+        const identifier = product.slug || product.id;
+        const res = await axios.get(`${API_URL}/${identifier}`);
         
-        // Dynamic fallback extracts data whether backend responds with { product } or direct object
         activeProduct = res.data.product || res.data;
       } catch (err) {
         console.error("Failed to load deep single product profile info:", err);
@@ -153,11 +157,10 @@ const ProductManager = ({ search = '' }) => {
         parsedSpecs = {};
       }
 
-      // Populate form data parameters, explicitly guaranteeing string fallbacks for the description field
       setFormData({
         ...initialFormState,
         ...activeProduct,
-        description: activeProduct.description || '', // Safe fallback keeps textarea running cleanly
+        description: activeProduct.description || '', 
         features: parsedFeatures,
         specs: parsedSpecs,
         image_file: null 
@@ -179,7 +182,6 @@ const ProductManager = ({ search = '' }) => {
     setFormData(initialFormState);
     setImagePreview(null);
   };
-
   const toggleHero = async (product) => {
     setLoading(true);
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
@@ -200,7 +202,9 @@ const ProductManager = ({ search = '' }) => {
     });
 
     try {
-      await axios.put(`${API_URL}/${product.id}`, data, {
+      // 👈 1. Updated endpoint path parameter targeting to look up via product.slug
+      const identifier = product.slug || product.id;
+      await axios.put(`${API_URL}/${identifier}`, data, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
@@ -215,15 +219,23 @@ const ProductManager = ({ search = '' }) => {
     }
   };
 
-  const handleDelete = async (id) => {
+  // 👈 2. Updated parameter profile assignment from raw database 'id' to 'slug' string
+  const handleDelete = async (slug, idFallback = null) => {
     if (typeof window === 'undefined') return;
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     
     const token = localStorage.getItem('token');
     const config = { headers: { Authorization: `Bearer ${token}` } };
+    
+    // Fall back to numeric id indexation safely if working with non-migrated data structures
+    const identifier = slug || idFallback;
+
     try {
-      await axios.delete(`${API_URL}/${id}`, config);
-      setProducts(products.filter(p => p.id !== id));
+      // 👈 3. Hit the updated Express DELETE product route path targeting your product slug
+      await axios.delete(`${API_URL}/${identifier}`, config);
+      
+      // 👈 4. Filter state using slugs or matching target fallback primary keys
+      setProducts(products.filter(p => p.slug !== identifier && p.id !== identifier));
     } catch (err) {
       alert("Delete failed.");
     }
@@ -268,7 +280,8 @@ const ProductManager = ({ search = '' }) => {
             filteredProducts={filteredProducts}
             productCount={products.length}
             openForm={openForm}
-            handleDelete={handleDelete}
+            // Passing down our newly slugified reference method handler cleanly
+            handleDelete={(p) => handleDelete(p.slug, p.id)}
             toggleHero={toggleHero}
             loading={loading}
           />

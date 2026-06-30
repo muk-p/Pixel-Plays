@@ -121,7 +121,7 @@ const ShoppingCatalog = ({ searchQuery }) => {
     );
   }
 
-  return (
+return (
     <div 
       id="shopping-section-root" 
       ref={sectionRootRef}
@@ -165,10 +165,11 @@ const ShoppingCatalog = ({ searchQuery }) => {
             <div className="w-full flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
               {items.map((item, itemIndex) => (
                 <div 
-                  key={item.id} 
+                  key={item.slug || item.id} // 👈 1. Updated item key to prioritize unique slug fields
                   className="group flex flex-col shrink-0 w-[calc(50%-8px)] md:w-52 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200/80 transition-all duration-300 overflow-hidden snap-start dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-800 dark:shadow-none"
                 >
-                  <Link href={`/product/${item.id}`} className="block relative">
+                  {/* 👈 2. Updated target image wrapper routing link to point to item.slug */}
+                  <Link href={`/product/${item.slug}`} className="block relative">
                     {/* ASSET CANVAS CONTAINER CONTAINER */}
                     <div className="relative aspect-[4/3] w-full bg-slate-50/50 flex items-center justify-center overflow-hidden dark:bg-black">
                       <Image 
@@ -212,7 +213,7 @@ const ShoppingCatalog = ({ searchQuery }) => {
                   {/* BOTTOM CTAS HOVER INTERACTIVE ACTIONS BLOCK */}
                   <div className="p-3 md:p-3.5 pt-0 mt-auto">
                     <Link
-                      href={`/product/${item.id}`}
+                      href={`/product/${item.slug}`} // 👈 3. Verified button routing link targets item.slug
                       className={`block w-full py-2 rounded-xl text-center text-[11px] md:text-xs font-bold tracking-wide transition-all active:scale-98 border ${
                         item.stock > 0
                           ? 'bg-slate-900 border-slate-900 text-white hover:bg-indigo-600 hover:border-indigo-600 shadow-sm shadow-slate-200 dark:bg-white dark:border-white dark:text-black dark:hover:bg-zinc-200 dark:shadow-none'

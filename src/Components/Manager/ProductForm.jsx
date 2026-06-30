@@ -1,4 +1,4 @@
-"use client"; // 🚀 Marked for execution within Next.js interactive form layouts
+"use client"; // Marked for execution within Next.js interactive form layouts
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -32,7 +32,7 @@ const ProductForm = ({
     } else {
       setSpecsString("");
     }
-  }, [formData.id, formData.features, formData.specs]); 
+  }, [formData.id, formData.slug, formData.features, formData.specs]); 
 
   // Intercept form submit to pack local string inputs back into clean structural parameters
   const handleSubmitIntercept = (e) => {
@@ -81,7 +81,7 @@ const ProductForm = ({
           if (items[i].type.indexOf('image') !== -1) {
             const file = items[i].getAsFile();
             if (file) {
-              // 1. Update the frontend visual preview box immediately
+              // Update the frontend visual preview box immediately
               handleImageChange({ target: { files: [file] } });
             }
           }
@@ -89,7 +89,7 @@ const ProductForm = ({
       }}
       className="bg-white rounded-4xl p-5 md:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
     >
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-10">
         
         {/* Left Side: Image Upload & Long-form Description Layout */}
         <div className="flex flex-col gap-6">
@@ -153,11 +153,30 @@ const ProductForm = ({
             onChange={(e) => setFormData({...formData, category: e.target.value})} 
           />
 
+          {/* URL Slug Management Control Row */}
+          <div>
+            <label className="text-[9px] font-black text-gray-400 uppercase tracking-wider ml-2 block mb-1">URL Slug</label>
+            <input 
+              type="text" 
+              placeholder="e.g. wireless-headphones (Optional)"
+              className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none font-medium text-xs text-gray-600 lowercase"
+              value={formData.slug || ''} 
+              onChange={(e) => setFormData({
+                ...formData, 
+                slug: e.target.value.toLowerCase().replace(/\s+/g, '-')
+              })} 
+            />
+            <p className="text-[9px] text-slate-400 mt-1 ml-2 font-medium">
+              Leave blank to automatically auto-generate a slug from the product name.
+            </p>
+          </div>
+
+          {/* Pricing & Stock Configuration Matrix */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div>
               <label className="text-[9px] font-black text-gray-400 uppercase tracking-wider ml-2">Price</label>
               <input 
-                type="number" placeholder="Price" required
+                type="number" placeholder="Price" required step="0.01" min="0"
                 className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none font-bold mt-1"
                 value={formData.price || ''} 
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
@@ -166,7 +185,7 @@ const ProductForm = ({
             <div>
               <label className="text-[9px] font-black text-gray-400 uppercase tracking-wider ml-2">Old Price</label>
               <input 
-                type="number" placeholder="Old Price"
+                type="number" placeholder="Old Price" step="0.01" min="0"
                 className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none font-bold mt-1"
                 value={formData.old_price || ''} 
                 onChange={(e) => setFormData({...formData, old_price: e.target.value})}
@@ -175,7 +194,7 @@ const ProductForm = ({
             <div>
               <label className="text-[9px] font-black text-gray-400 uppercase tracking-wider ml-2">Qty</label>
               <input 
-                type="number" placeholder="Qty" required
+                type="number" placeholder="Qty" required min="0"
                 className="w-full p-4 bg-gray-50 rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-white outline-none font-bold mt-1"
                 value={formData.stock || ''} 
                 onChange={(e) => setFormData({...formData, stock: e.target.value})}
@@ -183,6 +202,7 @@ const ProductForm = ({
             </div>
           </div>
 
+          {/* Bulk Specification Array Textareas */}
           <div>
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Features</label>
             <textarea 

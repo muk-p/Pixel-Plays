@@ -47,7 +47,8 @@ const ProductList = ({
           {/* Management Table View */}
           <div className="divide-y divide-gray-100">
             {groupedProducts[category].map(product => (
-              <div key={product.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
+              // 👈 1. Updated structural DOM mapping keys from product.id to handle unique slugs natively
+              <div key={product.slug || product.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
                 
                 {/* Info Column */}
                 <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -117,15 +118,16 @@ const ProductList = ({
                   {/* Edit Action */}
                   <button 
                     onClick={() => openForm(product)} 
-                    className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl font-black text-xs uppercase tracking-wider transition-colors"
+                    className="px-3.5 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl font-black text-xs uppercase tracking-wider transition-colors cursor-pointer"
                   >
                     Edit
                   </button>
 
                   {/* Delete Action */}
                   <button 
-                    onClick={() => handleDelete(product.id)} 
-                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-black text-xs uppercase tracking-wider transition-colors"
+                    // 👈 2. Updated click handler interceptor to pass the whole product object containing our slugs
+                    onClick={() => handleDelete(product)} 
+                    className="px-3.5 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl font-black text-xs uppercase tracking-wider transition-colors cursor-pointer"
                   >
                     Delete
                   </button>

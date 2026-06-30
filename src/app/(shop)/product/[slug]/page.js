@@ -7,9 +7,10 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pixelplays.co.ke';
 const getProductImage = (imageUrl) => 
   imageUrl ? `${API_BASE_URL}${imageUrl}` : `${API_BASE_URL}/uploads/default-product.png`;
 
-async function getProduct(id) {
+// Updated function parameter and fetch path targeting the express slug route
+async function getProduct(slug) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shopping/products/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/shopping/products/${slug}`, {
       next: { revalidate: 300 },
     });
 
@@ -24,8 +25,9 @@ async function getProduct(id) {
 }
 
 export async function generateMetadata({ params }) {
-  const { id } = await params;
-  const product = await getProduct(id);
+  // Destructure slug instead of id
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) {
     return {
@@ -41,12 +43,13 @@ export async function generateMetadata({ params }) {
     title: `${product.name} | Pixel Plays`,
     description,
     keywords: [product.name, product.brand, 'gaming products kenya', 'pixel plays'],
-    alternates: { canonical: `/product/${product.id}` },
+    // Updated canonical links and URLs to use the unique product slug string
+    alternates: { canonical: `/product/${product.slug}` },
     openGraph: {
       title: `${product.name} | Pixel Plays`,
       description,
       type: 'website',
-      url: `${siteUrl}/product/${product.id}`,
+      url: `${siteUrl}/product/${product.slug}`,
       images: [{ url: imageUrl, alt: product.name }],
     },
     twitter: {
@@ -59,17 +62,18 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function ProductPage({ params }) {
-  const { id } = await params;
-  const product = await getProduct(id);
+  // Destructure slug instead of id
+  const { slug } = await params;
+  const product = await getProduct(slug);
 
   if (!product) {
     notFound();
   }
 
   const imageUrl = getProductImage(product.image_url);
-  const productUrl = `${siteUrl}/product/${product.id}`;
+  const productUrl = `${siteUrl}/product/${product.slug}`;
 
-  // Streamlined, fully accurate search engine schema layout
+  // Streamlined, fully accurate search engine schema layout updated to use slug paths
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
