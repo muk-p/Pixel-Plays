@@ -37,43 +37,6 @@ const ProductOverview = ({ product, quantity, setQuantity, handleAddToCart, form
         </div>
       </div>
 
-      {/* Key Features List */}
-      {Array.isArray(product.features) && product.features.length > 0 && (
-        <div className="w-full bg-gray-50 rounded-2xl border border-gray-200 p-5 box-border mb-6">
-          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
-            <div className="w-1.5 h-6 bg-teal-500 rounded-full" />
-            <h3 className="font-bold text-gray-900 uppercase text-xs tracking-wider">
-              Key Features
-            </h3>
-          </div>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs md:text-sm text-gray-700 list-inside list-disc">
-            {product.features.map((feature, idx) => (
-              <li key={idx} className="leading-relaxed">{feature}</li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {/* Specifications Grid */}
-      {product.specs && Object.keys(product.specs).length > 0 && (
-        <div className="w-full bg-gray-50 rounded-2xl border border-gray-200 p-5 box-border mb-6">
-          <div className="flex items-center gap-2 mb-3 pb-2 border-b border-gray-200">
-            <div className="w-1.5 h-6 bg-amber-500 rounded-full" />
-            <h3 className="font-bold text-gray-900 uppercase text-xs tracking-wider">
-              Technical Specifications
-            </h3>
-          </div>
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-xs md:text-sm">
-            {Object.entries(product.specs).map(([key, value]) => (
-              <div key={key} className="flex justify-between border-b border-gray-100 pb-1">
-                <span className="text-gray-500 font-medium capitalize">{key.replace(/_/g, ' ')}:</span>
-                <span className="text-gray-900 font-bold text-right">{value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Pricing Information */}
       <div className="flex items-center gap-4 mb-8">
         <span className="text-3xl font-black text-gray-900">
