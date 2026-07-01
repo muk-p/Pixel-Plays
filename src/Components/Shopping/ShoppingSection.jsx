@@ -126,7 +126,7 @@ return (
     <div 
       id="shopping-section-root" 
       ref={sectionRootRef}
-      className="w-full max-w-full space-y-14 py-8 overflow-visible bg-slate-50/30 scroll-mt-16 transition-colors duration-300 dark:bg-background" 
+      className="w-full max-w-full space-y-14 py-8 overflow-visible bg-background scroll-mt-16 transition-colors duration-300" 
     >
       {sortedCategoryEntries.map(([category, items], categoryIndex) => {
         // 👈 NEW CONDITIONAL FILTERING ENGINE:
@@ -182,7 +182,7 @@ return (
                 return (
                 <div 
                   key={item.slug || item.id} 
-                  className={`group flex flex-col ${isCategoryFocused ? 'w-full' : 'shrink-0 w-[calc(50%-8px)] md:w-52'} bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200/80 transition-all duration-300 overflow-hidden ${isCategoryFocused ? '' : 'snap-start'} dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-800 dark:shadow-none`}
+                  className={`group flex flex-col ${isCategoryFocused ? 'w-full' : 'shrink-0 w-[calc(50%-8px)] md:w-52'} bg-white rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 overflow-hidden ${isCategoryFocused ? '' : 'snap-start'} hover:-translate-y-1 hover:shadow-xl hover:border-indigo-200 dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-700 dark:shadow-none dark:hover:shadow-zinc-900/20`}
                 >
                   <Link href={`/product/${item.slug}`} className="block relative">
                     {/* ASSET CANVAS CONTAINER CONTAINER */}
@@ -232,7 +232,7 @@ return (
                       href={`/product/${item.slug}`} 
                       className={`block w-full py-2 rounded-xl text-center text-[11px] md:text-xs font-bold tracking-wide transition-all active:scale-98 border ${
                         item.stock > 0
-                          ? 'bg-slate-900 border-slate-900 text-white hover:bg-indigo-600 hover:border-indigo-600 shadow-sm shadow-slate-200 dark:bg-white dark:border-white dark:text-black dark:hover:bg-zinc-200 dark:shadow-none'
+                          ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm shadow-indigo-200 hover:bg-indigo-700 hover:border-indigo-700 hover:shadow-md dark:bg-indigo-500 dark:border-indigo-500 dark:text-white dark:hover:bg-indigo-400'
                           : 'bg-slate-50 border-slate-200 text-slate-400 dark:bg-zinc-900/50 dark:border-(--border) dark:text-zinc-600'
                       }`}
                     >

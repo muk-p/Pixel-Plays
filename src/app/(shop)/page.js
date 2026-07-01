@@ -37,7 +37,7 @@ export default function HomePage({ isGaming, setIsGaming, search, setAuthMode })
           </header>
         </div>
 
-        <section className="w-full  dark:bg-gray-950">
+        <section className="w-full">
           {isGaming ? (
             <GamingSection searchQuery={search} setAuthMode={setAuthMode} />
           ) : (
