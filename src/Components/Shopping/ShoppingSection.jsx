@@ -137,6 +137,7 @@ return (
 
         const sectionId = `category-${formatCategoryId(category)}`;
         const isHighlighted = activeCategory && String(activeCategory).toLowerCase() === String(category).toLowerCase();
+        const isCategoryFocused = Boolean(isHighlighted);
 
         return (
           <div 
@@ -173,9 +174,7 @@ return (
               </Link>
             </div>
             
-            {/* HORIZONTAL TOUCH RUNNER SCROLL ROW */}
-            {/* 💡 Note: If a single category is isolated, you could also switch 'flex overflow-x-auto' to 'grid grid-cols-2 md:grid-cols-4 gap-4' to make it a clean static layout block instead of a side-scrolling list card strip! */}
-            <div className="w-full flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
+            <div className={`w-full ${isCategoryFocused ? 'grid grid-cols-2 gap-4 pb-5 md:grid-cols-3 lg:grid-cols-4' : 'flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]'}`}>
               {items.map((item, itemIndex) => {
                 const resolvedImageSrc = getImageUrl(item.image_url);
                 const useUnoptimizedImage = isRemoteImageSource(resolvedImageSrc);
@@ -183,7 +182,7 @@ return (
                 return (
                 <div 
                   key={item.slug || item.id} 
-                  className="group flex flex-col shrink-0 w-[calc(50%-8px)] md:w-52 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200/80 transition-all duration-300 overflow-hidden snap-start dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-800 dark:shadow-none"
+                  className={`group flex flex-col ${isCategoryFocused ? 'w-full' : 'shrink-0 w-[calc(50%-8px)] md:w-52'} bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200/80 transition-all duration-300 overflow-hidden ${isCategoryFocused ? '' : 'snap-start'} dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-800 dark:shadow-none`}
                 >
                   <Link href={`/product/${item.slug}`} className="block relative">
                     {/* ASSET CANVAS CONTAINER CONTAINER */}
