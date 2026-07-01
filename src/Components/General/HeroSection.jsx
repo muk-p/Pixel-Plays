@@ -5,12 +5,13 @@ import Link from 'next/link';
 import axios from 'axios';
 import { API_ENDPOINTS, getImageUrl } from '../../config/api';
 import Image from 'next/image';
-import localImageLoader from '../../config/ImageLoader';
+import localImageLoader, { isRemoteImageSource } from '../../config/ImageLoader';
 
 const HeroSection = () => {
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [autoPauseUntil, setAutoPauseUntil] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
   
   // Tracking states for touch coordinates
@@ -39,20 +40,28 @@ const HeroSection = () => {
 
   // AUTOMATIC SLIDER TIMER
   useEffect(() => {
-    if (offers.length > 1) {
-      const timer = setInterval(() => {
-        handleNext();
-      }, 5000);
-      return () => clearInterval(timer);
-    }
-  }, [offers]);
+    if (offers.length <= 1) return;
+
+    const timer = setInterval(() => {
+      if (Date.now() < autoPauseUntil) return;
+      setCurrentIndex((prev) => (prev === offers.length - 1 ? 0 : prev + 1));
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [offers.length, autoPauseUntil]);
+
+  const pauseAutoAdvance = () => {
+    setAutoPauseUntil(Date.now() + 10000);
+  };
 
   // Directional navigation methods
   const handlePrev = () => {
+    pauseAutoAdvance();
     setCurrentIndex((prev) => (prev === 0 ? offers.length - 1 : prev - 1));
   };
 
   const handleNext = () => {
+    pauseAutoAdvance();
     setCurrentIndex((prev) => (prev === offers.length - 1 ? 0 : prev + 1));
   };
 
@@ -60,6 +69,7 @@ const HeroSection = () => {
   const minSwipeDistance = 50; // Minimum swipe movement required in pixels
 
   const handleTouchStart = (e) => {
+    pauseAutoAdvance();
     setTouchEnd(null); // Reset before tracking new swipe
     setTouchStart(e.targetTouches[0].clientX);
   };
@@ -118,6 +128,9 @@ const HeroSection = () => {
             return null;
           }
 
+          const resolvedImageSrc = getImageUrl(product.image_url);
+          const useUnoptimizedImage = isRemoteImageSource(resolvedImageSrc);
+
           return (
             <div
               key={product.id}
@@ -130,13 +143,14 @@ const HeroSection = () => {
               >
                 <Image
                   loader={localImageLoader}
-                  src={getImageUrl(product.image_url)}
+                  src={resolvedImageSrc}
                   alt={product.name}
                   fill 
                   sizes="(max-w-768px) 100vw, 66vw" 
                   priority={index === 0} 
                   fetchpriority={index === 0 ? "high" : "low"}
                   decoding="async"
+                  unoptimized={useUnoptimizedImage}
                   className="object-cover" 
                 />                
                 <div className="md:hidden absolute inset-0 bg-gradient-to-r from-white via-white/40 to-transparent" />
@@ -179,7 +193,7 @@ const HeroSection = () => {
                 href={`/product/${current.id}`}
                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold text-sm md:text-base hover:bg-indigo-700 transition-all shadow-md"
               >
-                View NOW
+                VIEW NOW
               </Link>
             </div>
           </div>
@@ -218,7 +232,10 @@ const HeroSection = () => {
         {offers.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => {
+              pauseAutoAdvance();
+              setCurrentIndex(index);
+            }}
             className={`h-1 transition-all duration-300 rounded-full ${
               index === currentIndex ? 'w-8 bg-indigo-500' : 'w-3 bg-slate-300'
             }`}

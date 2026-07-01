@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation'; 
+import { usePathname, useSearchParams } from 'next/navigation'; 
 import axios from 'axios';
 import { API_ENDPOINTS, getImageUrl } from '../../config/api';
 import Image from 'next/image'; 
 import { rateLimitedRequest } from '@/utils/rateLimiter';
-import localImageLoader from '@/config/ImageLoader'; 
+import localImageLoader, { isRemoteImageSource } from '@/config/ImageLoader'; 
 
 const formatCategoryId = (categoryId) =>
   String(categoryId || '')
@@ -16,6 +16,7 @@ const formatCategoryId = (categoryId) =>
 
 // Internal component to safely isolate and read client URL search parameters
 const ShoppingCatalog = ({ searchQuery }) => {
+  const pathname = usePathname();
   const searchParams = useSearchParams(); 
   const activeCategory = searchParams.get('category');
   
@@ -157,7 +158,12 @@ return (
               
               {/* CLICK INTERCEPTOR WRAPPER: Selecting this updates parameters and isolates layout smoothly */}
               <Link 
-                href={`/shop?category=${encodeURIComponent(category)}`} // 👈 Wrapped in encodeURIComponent to safely handle categories with spaces like 'VR Gear' or 'Pre-owned'
+                href={(() => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set('category', category);
+                  const queryString = params.toString();
+                  return `${pathname}${queryString ? `?${queryString}` : ''}`;
+                })()}
                 scroll={true} // 👈 Force true to snap users back to the top of the newly filtered single row view
                 className="inline-block transition-transform hover:scale-105 active:scale-95"
               >
@@ -170,7 +176,11 @@ return (
             {/* HORIZONTAL TOUCH RUNNER SCROLL ROW */}
             {/* 💡 Note: If a single category is isolated, you could also switch 'flex overflow-x-auto' to 'grid grid-cols-2 md:grid-cols-4 gap-4' to make it a clean static layout block instead of a side-scrolling list card strip! */}
             <div className="w-full flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]">
-              {items.map((item, itemIndex) => (
+              {items.map((item, itemIndex) => {
+                const resolvedImageSrc = getImageUrl(item.image_url);
+                const useUnoptimizedImage = isRemoteImageSource(resolvedImageSrc);
+
+                return (
                 <div 
                   key={item.slug || item.id} 
                   className="group flex flex-col shrink-0 w-[calc(50%-8px)] md:w-52 bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-slate-200/80 transition-all duration-300 overflow-hidden snap-start dark:bg-(--surface) dark:border-(--border) dark:hover:border-zinc-800 dark:shadow-none"
@@ -180,7 +190,7 @@ return (
                     <div className="relative aspect-[4/3] w-full bg-slate-50/50 flex items-center justify-center overflow-hidden dark:bg-black">
                       <Image 
                         loader={localImageLoader}
-                        src={getImageUrl(item.image_url)} 
+                        src={resolvedImageSrc} 
                         alt={item.name}
                         fill 
                         sizes="(max-w-768px) 50vw, 208px" 
@@ -189,6 +199,7 @@ return (
                         placeholder="blur"
                         blurDataURL="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNCIgaGVpZ2h0PSIzIiB2aWV3Qm94PSIwIDAgNCAzIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjMiIGZpbGw9IiNGM0Y0RjYiLz48L3N2Zz4="
                         decoding="async"
+                        unoptimized={useUnoptimizedImage}
                         className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                       />
                       
@@ -230,7 +241,8 @@ return (
                     </Link>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );

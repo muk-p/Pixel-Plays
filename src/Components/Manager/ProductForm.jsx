@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { getImageUrl } from '../../config/api';
+import { isRemoteImageSource } from '../../config/ImageLoader';
 
 const ProductForm = ({
   formData,
@@ -35,6 +37,9 @@ const ProductForm = ({
   }, [formData.id, formData.slug, formData.features, formData.specs]); 
 
   // Intercept form submit to pack local string inputs back into clean structural parameters
+  const previewSrc = imagePreview ? getImageUrl(imagePreview) : null;
+  const useUnoptimizedPreview = Boolean(previewSrc && isRemoteImageSource(previewSrc));
+
   const handleSubmitIntercept = (e) => {
     e.preventDefault();
 
@@ -99,12 +104,12 @@ const ProductForm = ({
               {imagePreview ? (
                 <div className="w-full h-full relative">
                   <Image 
-                    src={imagePreview} 
+                    src={previewSrc} 
                     className="object-contain" 
                     alt="Preview UI upload stream visual illustration frame layout" 
                     fill
                     sizes="(max-w-7xl) 50vw, 33vw"
-                    unoptimized={true} // Bypasses local hostname tracking blocks for multi-part blob links
+                    unoptimized={useUnoptimizedPreview}
                   />
                 </div>
               ) : (

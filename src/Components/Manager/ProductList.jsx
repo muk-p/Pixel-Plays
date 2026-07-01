@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image'; // 🚀 Next.js optimized Image loader tool
 import { getImageUrl } from '../../config/api';
+import { isRemoteImageSource } from '../../config/ImageLoader';
 
 const ProductList = ({
   filteredProducts,
@@ -46,7 +47,11 @@ const ProductList = ({
 
           {/* Management Table View */}
           <div className="divide-y divide-gray-100">
-            {groupedProducts[category].map(product => (
+            {groupedProducts[category].map(product => {
+              const resolvedImageSrc = resolveProductImage(product.image_url);
+              const useUnoptimizedImage = isRemoteImageSource(resolvedImageSrc);
+
+              return (
               // 👈 1. Updated structural DOM mapping keys from product.id to handle unique slugs natively
               <div key={product.slug || product.id} className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-gray-50/50 transition-colors">
                 
@@ -55,12 +60,12 @@ const ProductList = ({
                   {/* Next.js Optimization Frame Wrapper for Fluid Sizing layout */}
                   <div className="w-12 h-12 relative overflow-hidden bg-gray-100 rounded-xl shrink-0 border border-gray-100">
                     <Image 
-                      src={resolveProductImage(product.image_url)}
+                      src={resolvedImageSrc}
                       alt={product.name || "Product item layout illustration thumbnail picture"} 
                       fill
                       sizes="48px"
                       className="object-cover"
-                      unoptimized={true} // Bypasses explicit domains whitelisting setup verification rules if loading remote external URLs directly
+                      unoptimized={useUnoptimizedImage}
                     />
                   </div>
                   <div className="min-w-0">
@@ -134,7 +139,8 @@ const ProductList = ({
                 </div>
 
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )) : (

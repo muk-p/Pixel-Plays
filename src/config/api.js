@@ -39,7 +39,12 @@ const API_ENDPOINTS = {
 
 // Helper function to get full image URL
 export const getImageUrl = (imagePath) => {
-  if (!imagePath) return 'https://placeholder.com';
+  if (!imagePath) return 'https://placehold.co/600x400?text=No+Image';
+  if (typeof imagePath !== 'string') return imagePath;
+
+  if (/^(https?:)?\/\//i.test(imagePath) || imagePath.startsWith('blob:') || imagePath.startsWith('data:')) {
+    return imagePath;
+  }
 
   if (imagePath.startsWith('/uploads')) {
     return `${API_BASE_URL}${imagePath}`;
