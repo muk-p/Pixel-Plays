@@ -63,7 +63,7 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
 
   if (error) {
     return (
-      <div className="text-center py-8">
+      <div className="text-center py-8 px-4">
         <p className="text-red-600 mb-2">{error}</p>
         <button
           onClick={() => window.location.reload()}
@@ -83,45 +83,52 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
           href={`/gaming-code/${product.slug || product.id}`} // Updated routing syntax
           className="block"
         >
-          <div className="bg-(--surface) rounded-2xl p-3 md:p-4 border border-(--border) hover:border-indigo-500 transition-all shadow-sm group relative cursor-pointer">
+          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 rounded-[28px] p-4 md:p-5 border border-slate-200/80 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.35)] hover:shadow-[0_24px_64px_-32px_rgba(15,23,42,0.35)] transition-all duration-300 group relative overflow-hidden cursor-pointer">
+
+            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-indigo-100/70 to-transparent pointer-events-none" />
 
             {/* Card Header */}
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-[9px] bg-(--surface-alt) px-1.5 py-0.5 rounded font-bold text-(--muted) uppercase">
+            <div className="flex justify-between items-center gap-2 mb-4">
+              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500 bg-white/80 border border-slate-200 rounded-full px-2 py-1 shadow-sm">
                 {product.region}
               </span>
-              <span className="text-[9px] text-indigo-600 font-bold uppercase">
+              <span className="text-[10px] font-black uppercase tracking-[0.24em] text-indigo-700">
                 {product.platform}
               </span>
             </div>
 
             {/* Product Info */}
-            <h3 className="text-xs md:text-sm font-bold text-foreground leading-tight h-10 line-clamp-2">
+            <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight h-14 line-clamp-2 mb-4">
               {product.name}
             </h3>
 
             {/* Stock indicator */}
-            <div className="mb-2 flex items-center justify-between">
-              {product.stock <= 5 && (
-                <span
-                  className={`rounded px-1.5 py-0.5 text-[8px] font-bold uppercase ${
-                    product.stock === 0 
-                      ? "bg-red-50 text-red-600" 
-                      : "bg-yellow-50 text-yellow-600"
-                  }`}
-                >
-                  {product.stock === 0 ? "Out of stock" : `Only ${product.stock} left`}
+            <div className="mb-4 flex items-center justify-between gap-3">
+              {product.stock <= 5 ? (
+                <span className={`rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase ${
+                    product.stock === 0
+                      ? 'bg-red-50 text-red-700 border border-red-100'
+                      : 'bg-amber-50 text-amber-700 border border-amber-100'
+                  }`}>
+                  {product.stock === 0 ? 'Out of stock' : `Only ${product.stock} left`}
+                </span>
+              ) : (
+                <span className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
+                  Ready to play
                 </span>
               )}
-              <span className="ml-auto text-xs text-(--muted)">
+              <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">
                 Tap for details
               </span>
             </div>
 
-            <div className="mt-4 flex items-center justify-between">
-              <span className="text-base md:text-lg font-black text-gray-900">
-                KES {product.price.toLocaleString()}
-              </span>
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs text-slate-500 uppercase tracking-[0.24em] mb-1">Starting at</p>
+                <span className="text-lg md:text-xl font-black text-slate-900">
+                  KES {product.price.toLocaleString()}
+                </span>
+              </div>
 
               {/* Dynamic Button Overlay */}
               <button
@@ -130,18 +137,18 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
                   handlePurchase(product);
                 }}
                 disabled={product.stock === 0}
-                className={`transition-all duration-200 active:scale-95 shadow-md flex items-center justify-center gap-1
-                  ${product.stock === 0
-                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                className={`transition-all duration-200 active:scale-[0.98] shadow-lg flex items-center justify-center gap-2 whitespace-nowrap ${
+                  product.stock === 0
+                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-200'
                     : user
-                      ? 'bg-indigo-600 text-white p-2 rounded-xl hover:bg-indigo-700'
-                      : 'bg-purple-50 text-purple-600 px-3 py-1.5 rounded-lg font-bold text-[10px] uppercase border border-purple-100 hover:bg-purple-100'
-                  }`}
+                      ? 'bg-indigo-600 text-white px-4 py-3 rounded-2xl hover:bg-indigo-700 border border-indigo-600'
+                      : 'bg-white text-purple-700 px-4 py-3 rounded-2xl font-bold text-[10px] uppercase border border-purple-200 hover:bg-purple-50'
+                }`}
               >
                 {product.stock === 0 ? (
                   <span className="text-[10px]">Out of Stock</span>
                 ) : user ? (
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
                   </svg>
                 ) : (
@@ -152,8 +159,8 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
 
             {/* Hover Tooltip for Guests (Desktop Only) */}
             {!user && product.stock > 0 && (
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none hidden md:block">
-                <span className="bg-gray-800 text-white text-[8px] px-2 py-1 rounded shadow-lg">Login to Buy</span>
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none hidden md:block">
+                <span className="bg-slate-900 text-white text-[9px] px-2 py-1 rounded-full shadow-lg">Login to Buy</span>
               </div>
             )}
           </div>

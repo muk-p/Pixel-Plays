@@ -14,7 +14,6 @@ const Checkout = () => {
   return (
     <div className="min-h-[calc(100vh-53px)] w-full bg-gray-50 flex items-center justify-center py-8 px-4 overflow-y-auto">
       {isProcessingOrComplete ? (
-        // Fixed: Passed all required variables so the loading circle knows when to flip to the green checkmark
         <CheckoutSuccess 
           orderId={form.orderId} 
           success={form.success} 
@@ -22,6 +21,28 @@ const Checkout = () => {
         />
       ) : (
         <div className="w-full max-w-md bg-white rounded-3xl shadow-xl p-6 md:p-8 border border-gray-100 h-auto">
+          <div className="mb-6 rounded-3xl border border-dashed border-indigo-200 bg-indigo-50 p-6">
+            <p className="text-sm text-indigo-700 font-medium mb-4">
+              Our online checkout is currently inactive. To complete your purchase, pay directly to the till below.
+            </p>
+
+            <div className="space-y-3">
+              <div className="rounded-2xl bg-white p-5 border border-indigo-100 shadow-sm">
+                <p className="text-[10px] uppercase tracking-widest font-black text-indigo-500">Till Number</p>
+                <p className="text-2xl font-black text-indigo-900">9218652</p>
+              </div>
+
+              <div className="rounded-2xl bg-white p-5 border border-indigo-100 shadow-sm">
+                <p className="text-[10px] uppercase tracking-widest font-black text-indigo-500">Payee Name</p>
+                <p className="text-2xl font-black text-indigo-900">John Mukara</p>
+              </div>
+            </div>
+
+            <div className="mt-6 rounded-2xl bg-indigo-100 p-4 border border-indigo-200 text-sm text-indigo-700">
+              Please complete payment using M-Pesa to the till number above and keep your confirmation message.
+            </div>
+          </div>
+
           <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 tracking-tight">
             M-Pesa Checkout
           </h2>
