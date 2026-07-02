@@ -79,8 +79,8 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
     <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 animate-in fade-in duration-500">
       {filtered.map(product => (
         <Link
-          key={product.id}
-          href={`/gaming-code/${product.id}`} // Updated routing syntax
+          key={product.slug || product.id}
+          href={`/gaming-code/${product.slug || product.id}`} // Updated routing syntax
           className="block"
         >
           <div className="bg-(--surface) rounded-2xl p-3 md:p-4 border border-(--border) hover:border-indigo-500 transition-all shadow-sm group relative cursor-pointer">

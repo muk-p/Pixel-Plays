@@ -67,7 +67,7 @@ const CodesManager = ({ search = '' }) => {
 
       if (formData.id) {
         // Update existing code
-        await axios.put(API_ENDPOINTS.GAMING.UPDATE_CODE(formData.id), codeData, {
+        await axios.put(API_ENDPOINTS.GAMING.UPDATE_CODE(formData.slug || formData.id), codeData, {
           headers: getAuthHeaders()
         });
       } else {
@@ -122,7 +122,7 @@ const CodesManager = ({ search = '' }) => {
   const openInventory = async (product) => {
     setSelectedProduct(product);
     try {
-      const response = await axios.get(API_ENDPOINTS.GAMING.GET_INVENTORY(product.id), {
+      const response = await axios.get(API_ENDPOINTS.GAMING.GET_INVENTORY(product.slug || product.id), {
         headers: getAuthHeaders()
       });
       setInventory(response.data);
@@ -147,7 +147,7 @@ const CodesManager = ({ search = '' }) => {
 
     try {
       setError(null);
-      await axios.post(API_ENDPOINTS.GAMING.ADD_INVENTORY(selectedProduct.id), 
+      await axios.post(API_ENDPOINTS.GAMING.ADD_INVENTORY(selectedProduct.slug || selectedProduct.id), 
         { codes },
         { headers: getAuthHeaders() }
       );

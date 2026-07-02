@@ -59,7 +59,7 @@ export default async function sitemap() {
       const codes = Array.isArray(data) ? data : (data.codes || []);
 
       gamingCodeRoutes = codes.map((item) => ({
-        url: `${baseUrl}/gaming-code/${item.id}`,
+        url: `${baseUrl}/gaming-code/${item.slug || item.id}`,
         lastModified: new Date(item.updated_at || item.updatedAt || Date.now()),
         changeFrequency: 'weekly',
         priority: 0.8,

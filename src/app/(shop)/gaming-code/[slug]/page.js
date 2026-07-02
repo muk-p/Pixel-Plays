@@ -8,7 +8,7 @@ import { API_ENDPOINTS } from '@/config/api';
 
 const GamingCodePage = ({ params }) => {
   // Unwraps dynamic URL properties inside Next.js App Router layout trees
-  const { id } = use(params);
+  const { slug } = use(params);
   const { addToCart } = useCart();
 
   const [gamingCode, setGamingCode] = useState(null);
@@ -20,7 +20,7 @@ const GamingCodePage = ({ params }) => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get(API_ENDPOINTS.GAMING.GET_CODE(id));
+        const response = await axios.get(API_ENDPOINTS.GAMING.GET_CODE(slug));
         setGamingCode(response.data);
       } catch (err) {
         console.error('Error fetching gaming code:', err);
@@ -30,11 +30,11 @@ const GamingCodePage = ({ params }) => {
       }
     };
     
-    if (id) {
+    if (slug) {
       fetchGamingCode();
     }
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (

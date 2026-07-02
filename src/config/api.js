@@ -26,11 +26,11 @@ const API_ENDPOINTS = {
     CODES: `${API_BASE_URL}/api/gaming-codes`,
     PURCHASE: `${API_BASE_URL}/api/gaming-codes/purchase`,
     CODE_STATUS: (merchantRequestId) => `${API_BASE_URL}/api/gaming-codes/status/${merchantRequestId}`,
-    GET_CODE: (id) => `${API_BASE_URL}/api/gaming-codes/${id}`,
-    UPDATE_CODE: (id) => `${API_BASE_URL}/api/gaming-codes/${id}`,
-    DELETE_CODE: (id) => `${API_BASE_URL}/api/gaming-codes/${id}`,
-    ADD_INVENTORY: (id) => `${API_BASE_URL}/api/gaming-codes/${id}/inventory`,
-    GET_INVENTORY: (id) => `${API_BASE_URL}/api/gaming-codes/${id}/inventory`,
+    GET_CODE: (identifier) => `${API_BASE_URL}/api/gaming-codes/${identifier}`,
+    UPDATE_CODE: (identifier) => `${API_BASE_URL}/api/gaming-codes/${identifier}`,
+    DELETE_CODE: (identifier) => `${API_BASE_URL}/api/gaming-codes/${identifier}`,
+    ADD_INVENTORY: (identifier) => `${API_BASE_URL}/api/gaming-codes/${identifier}/inventory`,
+    GET_INVENTORY: (identifier) => `${API_BASE_URL}/api/gaming-codes/${identifier}/inventory`,
   },
 
   // File uploads
