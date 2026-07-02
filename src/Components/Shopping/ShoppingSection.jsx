@@ -51,11 +51,11 @@ const ShoppingCatalog = ({ searchQuery }) => {
     // Explicit priority dictionary matching your desired visual order
     const categorySortOrder = {
       'Console': 1,
-      'Accessories': 2,
-      'Phones': 3,
-      'TVs': 4,
-      'Digital': 5,
-      'Games': 6,
+      'Games': 2,
+      'Accessories': 3,
+      'Phones': 4,
+      'TVs': 5,
+      'Digital': 6,
       'Pre-owned': 7,
       'VR Gear': 8,
       'Merch': 9
