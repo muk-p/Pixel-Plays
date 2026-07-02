@@ -190,7 +190,7 @@ const HeroSection = () => {
 
             <div className="flex flex-row gap-3 justify-start">
               <Link
-                href={`/product/${current.id}`}
+                href={`/product/${current.slug || current.id}`}
                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold text-sm md:text-base hover:bg-indigo-700 transition-all shadow-md"
               >
                 VIEW NOW

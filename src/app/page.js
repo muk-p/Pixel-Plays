@@ -38,7 +38,7 @@ export default function HomePage() {
         </header>
       </div>
 
-      <section className="w-full  dark:bg-gray-950">
+      <section className="w-full py-4">
         {isGaming ? (
           <GamingSection searchQuery={search} setAuthMode={setAuthMode} />
         ) : (
