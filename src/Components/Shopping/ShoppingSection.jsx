@@ -55,9 +55,10 @@ const ShoppingCatalog = ({ searchQuery }) => {
       'Phones': 3,
       'TVs': 4,
       'Digital': 5,
-      'Pre-owned': 6,
-      'VR Gear': 7,
-      'Merch': 8
+      'Games': 6,
+      'Pre-owned': 7,
+      'VR Gear': 8,
+      'Merch': 9
     };
 
     let processedCatalog = [...catalog];

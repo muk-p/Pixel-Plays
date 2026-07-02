@@ -7,7 +7,8 @@ const CodesForm = ({
   setFormData,
   handleSave,
   error,
-  setIsEditing
+  setIsEditing,
+  generateSlug
 }) => {
   return (
     <form onSubmit={handleSave} className="bg-(--surface) rounded-3xl p-6 md:p-8 border border-(--border) shadow-sm animate-in fade-in zoom-in-95 duration-200">
@@ -32,6 +33,30 @@ const CodesForm = ({
             value={formData.name}
             onChange={(e) => setFormData({...formData, name: e.target.value})}
           />
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <label className="text-[10px] font-black text-(--muted) uppercase ml-2 block tracking-wider">URL Slug</label>
+            <button
+              type="button"
+              onClick={() => setFormData({ ...formData, slug: generateSlug(formData.name) })}
+              className="text-[10px] font-semibold text-indigo-600 hover:text-indigo-700"
+            >
+              Auto-generate
+            </button>
+          </div>
+          <input
+            type="text"
+            placeholder="e.g. pubg-mobile-660-uc"
+            className="w-full p-4 bg-(--surface-alt) rounded-2xl border-2 border-transparent focus:border-indigo-500 focus:bg-(--surface) transition-all outline-none font-medium text-sm lowercase text-foreground placeholder:text-(--muted)"
+            value={formData.slug || ''}
+            onChange={(e) => setFormData({
+              ...formData,
+              slug: e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+            })}
+          />
+          <p className="text-[10px] text-(--muted) mt-1 ml-2">Leave blank to auto-generate from the product name.</p>
         </div>
 
         {/* First Row: Price and Platform inputs */}
@@ -79,6 +104,7 @@ const CodesForm = ({
               <option>India</option>
               <option>Europe</option>
               <option>Asia</option>
+              <option>UK</option>
             </select>
           </div>
         </div>

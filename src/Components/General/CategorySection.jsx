@@ -54,6 +54,15 @@ const CategorySection = () => {
       )
     },
     { 
+      id: 'Games', 
+      name: 'Games', 
+      icon: (
+        <svg xmlns="http://w3.org" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-full h-full">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 3.75H8.25A2.25 2.25 0 0 0 6 6v12a2.25 2.25 0 0 0 2.25 2.25h7.5A2.25 2.25 0 0 0 18 18V6a2.25 2.25 0 0 0-2.25-2.25ZM9 9.75h1.5M13.5 9.75H15M9 14.25h6M10.5 6.75V5.25m3 1.5V5.25" />
+        </svg>
+      )
+    },
+    { 
       id: 'Pre-owned', 
       name: 'Pre-owned', 
       icon: (

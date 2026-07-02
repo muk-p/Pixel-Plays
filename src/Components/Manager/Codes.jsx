@@ -7,6 +7,17 @@ import CodesForm from './CodesForm';
 import CodesList from './CodesList';
 import InventoryModal from './InventoryModal';
 
+const generateSlug = (text = '') => {
+  const base = String(text)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+
+  return base || 'gaming-code';
+};
+
 const CodesManager = ({ search = '' }) => {
   const [digitalProducts, setDigitalProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -21,7 +32,8 @@ const CodesManager = ({ search = '' }) => {
     price: '',
     region: 'Global',
     platform: 'Mobile',
-    description: ''
+    description: '',
+    slug: ''
   });
 
   // Get auth token for API calls - Wrapped in a Next.js environment check
@@ -62,7 +74,8 @@ const CodesManager = ({ search = '' }) => {
         price: parseFloat(formData.price),
         region: formData.region,
         platform: formData.platform,
-        description: formData.description || null
+        description: formData.description || null,
+        slug: formData.slug || generateSlug(formData.name)
       };
 
       if (formData.id) {
@@ -80,7 +93,7 @@ const CodesManager = ({ search = '' }) => {
       // Refresh the list
       await fetchGamingCodes();
       setIsEditing(false);
-      setFormData({ name: '', price: '', region: 'Global', platform: 'Mobile', description: '' });
+      setFormData({ name: '', price: '', region: 'Global', platform: 'Mobile', description: '', slug: '' });
     } catch (err) {
       console.error('Error saving gaming code:', err);
       if (err.response?.status === 403) {
@@ -174,10 +187,11 @@ const CodesManager = ({ search = '' }) => {
         price: product.price.toString(),
         region: product.region,
         platform: product.platform,
-        description: product.description || ''
+        description: product.description || '',
+        slug: product.slug || ''
       });
     } else {
-      setFormData({ name: '', price: '', region: 'Global', platform: 'Mobile', description: '' });
+      setFormData({ name: '', price: '', region: 'Global', platform: 'Mobile', description: '', slug: '' });
     }
     setIsEditing(true);
     
@@ -217,6 +231,7 @@ const CodesManager = ({ search = '' }) => {
             handleSave={handleSave}
             error={error}
             setIsEditing={setIsEditing}
+            generateSlug={generateSlug}
           />
         ) : (
           <CodesList
