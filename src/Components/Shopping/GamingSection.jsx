@@ -51,10 +51,10 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[...Array(8)].map((_, i) => (
-          <div key={i} className="bg-(--surface-alt) rounded-2xl p-3 md:p-4 animate-pulse">
-            <div className="h-4 bg-(--surface)/80 rounded mb-2"></div>
-            <div className="h-3 bg-(--surface)/80 rounded mb-1"></div>
-            <div className="h-6 bg-(--surface)/80 rounded"></div>
+          <div key={i} className="bg-surface-alt rounded-2xl p-3 md:p-4 animate-pulse">
+            <div className="h-4 bg-surface/80 rounded mb-2"></div>
+            <div className="h-3 bg-surface/80 rounded mb-1"></div>
+            <div className="h-6 bg-surface/80 rounded"></div>
           </div>
         ))}
       </div>
@@ -83,49 +83,49 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
           href={`/gaming-code/${product.slug || product.id}`} // Updated routing syntax
           className="block"
         >
-          <div className="bg-gradient-to-br from-white via-slate-50 to-slate-100 rounded-[28px] p-4 md:p-5 border border-slate-200/80 shadow-[0_18px_50px_-30px_rgba(15,23,42,0.35)] hover:shadow-[0_24px_64px_-32px_rgba(15,23,42,0.35)] transition-all duration-300 group relative overflow-hidden cursor-pointer">
+          <div className="group relative overflow-hidden rounded-[28px] border border-border bg-surface p-4 shadow-(--shadow) transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_24px_64px_-32px_rgba(15,23,42,0.35)] md:p-5 cursor-pointer">
 
-            <div className="absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-indigo-100/70 to-transparent pointer-events-none" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-linear-to-b from-accent/15 to-transparent" />
 
             {/* Card Header */}
-            <div className="flex justify-between items-center gap-2 mb-4">
-              <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-slate-500 bg-white/80 border border-slate-200 rounded-full px-2 py-1 shadow-sm">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <span className="rounded-full border border-border bg-surface-alt/80 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.24em] text-muted shadow-sm">
                 {product.region}
               </span>
-              <span className="text-[10px] font-black uppercase tracking-[0.24em] text-indigo-700">
+              <span className="text-[10px] font-black uppercase tracking-[0.24em] text-accent">
                 {product.platform}
               </span>
             </div>
 
             {/* Product Info */}
-            <h3 className="text-sm md:text-base font-bold text-slate-900 leading-tight h-14 line-clamp-2 mb-4">
+            <h3 className="mb-4 h-14 text-sm font-bold leading-tight text-foreground line-clamp-2 md:text-base">
               {product.name}
             </h3>
 
             {/* Stock indicator */}
             <div className="mb-4 flex items-center justify-between gap-3">
               {product.stock <= 5 ? (
-                <span className={`rounded-full px-3 py-1.5 text-[10px] font-semibold uppercase ${
+                <span className={`rounded-full border px-3 py-1.5 text-[10px] font-semibold uppercase ${
                     product.stock === 0
-                      ? 'bg-red-50 text-red-700 border border-red-100'
-                      : 'bg-amber-50 text-amber-700 border border-amber-100'
+                      ? 'border-danger/20 bg-danger/10 text-danger'
+                      : 'border-accent/20 bg-accent/10 text-accent'
                   }`}>
                   {product.stock === 0 ? 'Out of stock' : `Only ${product.stock} left`}
                 </span>
               ) : (
-                <span className="text-[10px] uppercase tracking-[0.24em] text-slate-400">
+                <span className="text-[10px] uppercase tracking-[0.24em] text-muted">
                   Ready to play
                 </span>
               )}
-              <span className="text-[10px] text-slate-400 uppercase tracking-[0.2em]">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-muted">
                 Tap for details
               </span>
             </div>
 
             <div className="flex items-center justify-between gap-3">
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-[0.24em] mb-1">Starting at</p>
-                <span className="text-lg md:text-xl font-black text-slate-900">
+                <p className="mb-1 text-xs uppercase tracking-[0.24em] text-muted">Starting at</p>
+                <span className="text-lg font-black text-foreground md:text-xl">
                   KES {product.price.toLocaleString()}
                 </span>
               </div>
@@ -137,12 +137,12 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
                   handlePurchase(product);
                 }}
                 disabled={product.stock === 0}
-                className={`transition-all duration-200 active:scale-[0.98] shadow-lg flex items-center justify-center gap-2 whitespace-nowrap ${
+                className={`flex items-center justify-center gap-2 whitespace-nowrap shadow-lg transition-all duration-200 active:scale-[0.98] ${
                   product.stock === 0
-                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed border border-slate-200'
+                    ? 'cursor-not-allowed border border-border bg-surface-alt px-4 py-3 text-muted rounded-2xl'
                     : user
-                      ? 'bg-indigo-600 text-white px-4 py-3 rounded-2xl hover:bg-indigo-700 border border-indigo-600'
-                      : 'bg-white text-purple-700 px-4 py-3 rounded-2xl font-bold text-[10px] uppercase border border-purple-200 hover:bg-purple-50'
+                      ? 'rounded-2xl border border-accent bg-accent px-4 py-3 text-white hover:bg-accent/90'
+                      : 'rounded-2xl border border-border bg-surface-alt px-4 py-3 font-bold text-[10px] uppercase text-accent hover:bg-surface'
                 }`}
               >
                 {product.stock === 0 ? (
@@ -160,7 +160,7 @@ const GamingSection = ({ searchQuery, setAuthMode }) => {
             {/* Hover Tooltip for Guests (Desktop Only) */}
             {!user && product.stock > 0 && (
               <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none hidden md:block">
-                <span className="bg-slate-900 text-white text-[9px] px-2 py-1 rounded-full shadow-lg">Login to Buy</span>
+                <span className="rounded-full bg-foreground px-2 py-1 text-[9px] text-surface shadow-lg">Login to Buy</span>
               </div>
             )}
           </div>
