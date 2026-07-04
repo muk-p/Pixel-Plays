@@ -95,7 +95,7 @@ const HeroSection = () => {
   // HIGH PERFORMANCE SKELETON PLACEHOLDER
   if (!hasMounted || loading) {
     return (
-      <div className="w-full h-[50vh] min-h-[400px] bg-slate-100 flex items-center px-6">
+      <div className="w-full h-[50vh] min-h-100 bg-slate-100 flex items-center px-6">
         <div className="max-w-7xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-4">
             <div className="h-4 w-24 bg-slate-200 rounded" />
@@ -116,7 +116,7 @@ const HeroSection = () => {
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
-      className="relative w-full h-[50vh] min-h-[400px] overflow-hidden bg-(--surface-alt) border-b border-(--border) group/section select-none touch-pan-y"
+      className="relative w-full h-[50vh] min-h-100 overflow-hidden bg-surface-alt border-b border-border group/section select-none touch-pan-y"
     >
       
       {/* BACKGROUND IMAGES */}
@@ -139,7 +139,7 @@ const HeroSection = () => {
               }`}
             >
               <div 
-                className="absolute inset-0 md:left-1/3 h-full w-full md:w-2/3 ml-auto [clip-path:none] md:[clip-path:polygon(15%_0,_100%_0,_100%_100%,_0%_100%)]"
+                className="absolute inset-0 md:left-[40%] md:w-[60%] lg:left-[42%] lg:w-[58%] ml-auto [clip-path:none] md:[clip-path:polygon(12%_0,100%_0,100%_100%,0%_100%)]"
               >
                 <Image
                   loader={localImageLoader}
@@ -151,9 +151,9 @@ const HeroSection = () => {
                   fetchpriority={index === 0 ? "high" : "low"}
                   decoding="async"
                   unoptimized={useUnoptimizedImage}
-                  className="object-cover" 
+                  className="object-cover md:object-contain" 
                 />                
-                <div className="md:hidden absolute inset-0 bg-gradient-to-r from-white via-white/40 to-transparent" />
+                <div className="md:hidden absolute inset-0 bg-linear-to-r from-white via-white/40 to-transparent" />
               </div>
             </div>
           );
@@ -161,18 +161,18 @@ const HeroSection = () => {
       </div>
 
       {/* CONTENT LAYER */}
-      <div className="relative z-20 h-full max-w-7xl mx-auto px-6 flex items-center pointer-events-none">
-        <div className="w-full md:w-1/2 text-left pointer-events-auto">
-          <div className="animate-fadeIn">
+      <div className="relative z-20 h-full max-w-7xl mx-auto px-6 md:px-8 lg:px-10 flex items-center pointer-events-none">
+        <div className="w-full md:w-[42%] lg:w-[40%] xl:w-[38%] max-w-120 text-left pointer-events-auto">
+          <div className="animate-fadeIn md:pr-4 lg:pr-6">
             <span className="block font-bold tracking-widest uppercase text-[10px] md:text-xs mb-2 text-indigo-600">
               New arrivals
             </span>
             
-            <h1 className="text-2xl md:text-5xl lg:text-6xl font-black leading-tight mb-2 text-(--muted)">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black leading-[1.05] md:leading-[1.05] mb-2 text-muted">
               {current.name}
             </h1>
 
-            <div className="flex items-center justify-start gap-3 mb-6">
+            <div className="flex flex-wrap items-center justify-start gap-3 mb-6 md:gap-4">
               <span className="text-2xl md:text-3xl font-black text-indigo-600">
                 KES {Number(current.price).toLocaleString()}
               </span>
@@ -188,7 +188,7 @@ const HeroSection = () => {
               )}
             </div>
 
-            <div className="flex flex-row gap-3 justify-start">
+            <div className="flex flex-row gap-3 justify-start md:mt-2">
               <Link
                 href={`/product/${current.slug || current.id}`}
                 className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-bold text-sm md:text-base hover:bg-indigo-700 transition-all shadow-md"
