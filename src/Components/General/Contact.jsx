@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 
-const SUPPORT_PHONE = '+254794966733';
-const SALES_PHONE = '+254795040185';
+const SALES_PHONE = '+254119318296';
 
 const buildWhatsAppUrl = (phone, message = 'Hello Pixel Plays, I need help.') => {
   const digits = phone.replace(/\D/g, '');
@@ -77,31 +76,21 @@ const ContactStrip = () => {
               </div>
               <div>
                 <p className="text-xs font-black sm:text-sm">Pixel Plays</p>
-                <p className="text-[10px] text-green-50/90 sm:text-[11px]">Support & sales team</p>
+                <p className="text-[10px] text-green-50/90 sm:text-[11px]">Support team</p>
               </div>
             </div>
 
             {/* Support Link */}
             <a
-              href={buildWhatsAppUrl(SUPPORT_PHONE, 'Hello Pixel Plays, I need support assistance.')}
+              href={buildWhatsAppUrl(SALES_PHONE, 'Hello Pixel Plays, I have a inquiry on a product.')}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-white/20 sm:px-3 sm:py-2.5 sm:text-sm"
             >
               <span>Support</span>
-              <span className="text-[10px] opacity-90 sm:text-xs">{SUPPORT_PHONE}</span>
-            </a>
-
-            {/* Sales Link */}
-            <a
-              href={buildWhatsAppUrl(SALES_PHONE, 'Hello Pixel Plays, I have a sales inquiry.')}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-white/20 sm:px-3 sm:py-2.5 sm:text-sm"
-            >
-              <span>Sales</span>
               <span className="text-[10px] opacity-90 sm:text-xs">{SALES_PHONE}</span>
             </a>
+
           </div>
         </div>
       </div>
