@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-const SALES_PHONE = '+254119318296';
+const SUPPORT_PHONE = '+254119318296';
+const SALES_PHONE = '+254 794 966 733';
 
 const buildWhatsAppUrl = (phone, message = 'Hello Pixel Plays, I need help.') => {
   const digits = phone.replace(/\D/g, '');
@@ -82,12 +83,22 @@ const ContactStrip = () => {
 
             {/* Support Link */}
             <a
-              href={buildWhatsAppUrl(SALES_PHONE, 'Hello Pixel Plays, I have a inquiry on a product.')}
+              href={buildWhatsAppUrl(SUPPORT_PHONE, 'Hello Pixel Plays, I need support.')}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-white/20 sm:px-3 sm:py-2.5 sm:text-sm"
             >
               <span>Support</span>
+              <span className="text-[10px] opacity-90 sm:text-xs">{SUPPORT_PHONE}</span>
+            </a>
+
+            <a
+              href={buildWhatsAppUrl(SALES_PHONE, 'Hello Pixel Plays, I have an inquiry about a product.')}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-between rounded-xl border border-white/20 bg-white/10 px-2.5 py-2 text-xs font-semibold text-white transition hover:bg-white/20 sm:px-3 sm:py-2.5 sm:text-sm"
+            >
+              <span>Sales</span>
               <span className="text-[10px] opacity-90 sm:text-xs">{SALES_PHONE}</span>
             </a>
 
