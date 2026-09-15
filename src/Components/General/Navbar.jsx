@@ -6,7 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import CartSection from './CartSection';
 import BuyerOrdersAside from './BuyerOrdersAside';
 import { useAuth } from '../../Context/AuthContext';
-import { API_BASE_URL } from '../../config/api';
+import { API_BASE_URL, fetchWithTimeout } from '../../config/api';
 
 const Logo = '/Logo1.png';
 
@@ -53,7 +53,7 @@ const Navbar = ({ search, setSearch, isGaming, setAuthMode }) => {
     setBuyerResult(null);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/shopping/order/${encodeURIComponent(term)}`);
+      const response = await fetchWithTimeout(`${API_BASE_URL}/api/shopping/order/${encodeURIComponent(term)}`);
       const data = await response.json();
 
       if (!response.ok) {

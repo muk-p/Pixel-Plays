@@ -5,6 +5,7 @@ class HighPerformanceLimiter {
     this.windowMs = windowMs;
     this.requestTimes = [];
     this.queue = [];
+    this.processingTimer = null;
   }
 
   // Processes or delays calls using a non-blocking Promise pipeline
@@ -28,15 +29,18 @@ class HighPerformanceLimiter {
       this.requestTimes.push(Date.now());
       
       // Execute the request
-      fn().then(resolve).catch(reject);
+      Promise.resolve().then(fn).then(resolve).catch(reject);
     }
 
     // If items remain in the queue, schedule a re-evaluation block right when the oldest window expires
-    if (this.queue.length > 0) {
+    if (this.queue.length > 0 && !this.processingTimer) {
       const oldestTime = this.requestTimes[0];
       const timeRemaining = this.windowMs - (now - oldestTime);
       
-      setTimeout(() => this.processQueue(), Math.max(timeRemaining, 10));
+      this.processingTimer = setTimeout(() => {
+        this.processingTimer = null;
+        this.processQueue();
+      }, Math.max(timeRemaining, 10));
     }
   }
 }

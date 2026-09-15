@@ -1,7 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useCart } from '../../Context/CartContext'; 
 import { useAuth } from '../../Context/AuthContext'; 
 import { API_ENDPOINTS } from '../../config/api';
+
+const fetchWithTimeout = async (url, options = {}, timeoutMs = 15000) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+};
 
 
 export const useCheckoutForm = () => {
@@ -16,12 +27,11 @@ export const useCheckoutForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [success, setSuccess] = useState(false);
   const [orderId, setOrderId] = useState(null);
+  const pollingCleanupRef = useRef(null);
 
-  useEffect(() => {
-    if (user?.name) {
-      setFullName(user.name);
-    }
-  }, [user]);
+  useEffect(() => () => {
+    pollingCleanupRef.current?.();
+  }, []);
 
   const hasHardware = items.some(item => item.category !== 'gaming-codes' && item.category !== 'codes');
   const isDigitalOnly = items.length > 0 && !hasHardware;
@@ -35,11 +45,20 @@ export const useCheckoutForm = () => {
   const startHardwarePolling = (merchantRequestId, timer) => {
     let checkCount = 0;
     const maxChecks = 25; 
+    let pollTimer;
+    let activeRequestController;
+    const cleanup = () => {
+      clearTimeout(pollTimer);
+      activeRequestController?.abort();
+      pollingCleanupRef.current = null;
+    };
+    pollingCleanupRef.current?.();
+    pollingCleanupRef.current = cleanup;
 
-    const interval = setInterval(async () => {
+    const poll = async () => {
       checkCount++;
       if (checkCount > maxChecks) {
-        clearInterval(interval);
+        cleanup();
         clearTimeout(timer);
         setLoading(false);
         setErrorMessage('Verification timed out. Please check your order management page.');
@@ -48,19 +67,23 @@ export const useCheckoutForm = () => {
 
       try {
         const token = getAuthToken();
-                
-          // Call the function using parentheses, then add your cache-buster timestamp
-        const res = await fetch(`${API_ENDPOINTS.SHOPPING.ORDER_STATUS(merchantRequestId)}?t=${new Date().getTime()}`, {
+        const requestController = new AbortController();
+        activeRequestController = requestController;
+        const requestTimeout = setTimeout(() => requestController.abort(), 10000);
+        const res = await fetch(`${API_ENDPOINTS.SHOPPING.ORDER_STATUS(merchantRequestId)}?t=${Date.now()}`, {
           headers: { 
             ...(token && { 'Authorization': `Bearer ${token}` }),
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
-          }
+          },
+          signal: requestController.signal
         });
+        clearTimeout(requestTimeout);
+        activeRequestController = null;
         const data = await res.json();
 
         if (data.status === 'processing' || data.status === 'delivered') {
-          clearInterval(interval);
+          cleanup();
           clearTimeout(timer);
           setLoading(false);
           setOrderId(data.orderNumber || data.orderId || merchantRequestId);
@@ -69,26 +92,41 @@ export const useCheckoutForm = () => {
           setPhone('');
           setAddress('');
         } else if (data.status === 'canceled') {
-          clearInterval(interval);
+          cleanup();
           clearTimeout(timer);
           setLoading(false);
           setErrorMessage('❌ Transaction cancelled or declined on your phone handset screen.');
         }
       } catch (err) {
+        activeRequestController = null;
         console.error('Hardware polling error:', err);
       }
-    }, 3000);
+      if (pollingCleanupRef.current === cleanup) {
+        pollTimer = setTimeout(poll, 3000);
+      }
+    };
+
+    poll();
   };
 
   // FIXED: Dynamic polling tracking utilizing central API configuration mapping definitions
   const startDigitalPolling = (merchantRequestId, timer) => {
     let checkCount = 0;
     const maxChecks = 25;
+    let pollTimer;
+    let activeRequestController;
+    const cleanup = () => {
+      clearTimeout(pollTimer);
+      activeRequestController?.abort();
+      pollingCleanupRef.current = null;
+    };
+    pollingCleanupRef.current?.();
+    pollingCleanupRef.current = cleanup;
 
-    const interval = setInterval(async () => {
+    const poll = async () => {
       checkCount++;
       if (checkCount > maxChecks) {
-        clearInterval(interval);
+        cleanup();
         clearTimeout(timer);
         setLoading(false);
         setErrorMessage('Verification timed out. Please check your email.');
@@ -97,19 +135,23 @@ export const useCheckoutForm = () => {
 
       try {
         const token = getAuthToken();
-        
-      // Build the string dynamically to prevent object function crashes
-      const res = await fetch(`${API_ENDPOINTS.GAMING.CODE_STATUS(merchantRequestId)}?t=${new Date().getTime()}`, {
+        const requestController = new AbortController();
+        activeRequestController = requestController;
+        const requestTimeout = setTimeout(() => requestController.abort(), 10000);
+        const res = await fetch(`${API_ENDPOINTS.GAMING.CODE_STATUS(merchantRequestId)}?t=${Date.now()}`, {
         headers: { 
           ...(token && { 'Authorization': `Bearer ${token}` }),
           'Cache-Control': 'no-cache',
           'Pragma': 'no-cache'
-        }
+          },
+          signal: requestController.signal
       });
+        clearTimeout(requestTimeout);
+        activeRequestController = null;
         const data = await res.json();
 
         if (data.status === 'completed') {
-          clearInterval(interval);
+          cleanup();
           clearTimeout(timer);
           setLoading(false);
           setOrderId(merchantRequestId);
@@ -117,20 +159,26 @@ export const useCheckoutForm = () => {
           clearCart();
           setPhone('');
         } else if (data.status === 'failed') {
-          clearInterval(interval);
+          cleanup();
           clearTimeout(timer);
           setLoading(false);
           setErrorMessage('❌ Transaction cancelled or declined on your phone screen.');
         } else if (data.status === 'refund_required') {
-          clearInterval(interval);
+          cleanup();
           clearTimeout(timer);
           setLoading(false);
           setErrorMessage('⚠️ Code sold out during payment. Support will issue a refund.');
         }
       } catch (err) {
+        activeRequestController = null;
         console.error('Polling error:', err);
       }
-    }, 3000);
+      if (pollingCleanupRef.current === cleanup) {
+        pollTimer = setTimeout(poll, 3000);
+      }
+    };
+
+    poll();
   };
 
   const handlePayment = async (e) => {
@@ -149,6 +197,7 @@ export const useCheckoutForm = () => {
 
     const token = getAuthToken();
     const paymentTimer = setTimeout(() => {
+      pollingCleanupRef.current?.();
       setLoading(false);
       setTimedOut(true);
     }, 60000); 
@@ -161,7 +210,7 @@ export const useCheckoutForm = () => {
         const targetItemId = items[0]?.id || 5; 
         
         // FIXED: Converted to point directly at your configuration variables path mapping helper
-        const response = await fetch(`${API_ENDPOINTS.GAMING.PURCHASE}/${targetItemId}`, {
+        const response = await fetchWithTimeout(`${API_ENDPOINTS.GAMING.PURCHASE}/${targetItemId}`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -187,14 +236,14 @@ export const useCheckoutForm = () => {
         // ==========================================
         const orderPayload = {
           items: items.map((item) => ({ productId: Number(item.id), quantity: Number(item.quantity) })),
-          customerName: fullName, 
+          customerName: fullName || user?.name || '',
           address: hasHardware ? address : 'Digital Delivery',
           paymentMethod: 'M-PESA',
           mpesaPhone: cleanPhone,
           notes: hasHardware ? `Shipping to ${address}` : 'Digital delivery'
         };
 
-        const response = await fetch(API_ENDPOINTS.SHOPPING.CHECKOUT, {
+        const response = await fetchWithTimeout(API_ENDPOINTS.SHOPPING.CHECKOUT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -232,7 +281,7 @@ export const useCheckoutForm = () => {
   };
 
   return {
-    items, totalPrice, formatCurrency, phone, setPhone, fullName, setFullName,
+    items, totalPrice, formatCurrency, phone, setPhone, fullName: fullName || user?.name || '', setFullName,
     address, setAddress, loading, timedOut, errorMessage, success, orderId,
     hasHardware, handlePayment
   };

@@ -27,6 +27,7 @@ export default async function sitemap() {
   try {
     const response = await fetch(`${API_BASE_URL}/api/shopping/products/sitemap`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(10000),
       agent: agent // 3. Inject the agent directly here
     }); // Use 'as any' only if you encounter a strict TypeScript compiler warning
 
@@ -51,6 +52,7 @@ export default async function sitemap() {
   try {
     const response = await fetch(`${API_BASE_URL}/api/gaming-codes`, {
       next: { revalidate: 3600 },
+      signal: AbortSignal.timeout(10000),
       agent: agent // 4. Inject the agent here too
     });
 

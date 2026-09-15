@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { API_BASE_URL } from '@/config/api';
+import { API_BASE_URL, fetchWithTimeout } from '@/config/api';
 import ProductPageClient from './ProductPageClient';
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pixelplays.co.ke';
@@ -10,7 +10,7 @@ const getProductImage = (imageUrl) =>
 // Updated function parameter and fetch path targeting the express slug route
 async function getProduct(slug) {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shopping/products/${slug}`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/api/shopping/products/${slug}`, {
       next: { revalidate: 300 },
     });
 

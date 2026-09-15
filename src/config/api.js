@@ -1,8 +1,23 @@
 // Centralized API Configuration for Next.js
 import { rateLimitedRequest } from '../utils/rateLimiter';
+import axios from 'axios';
 
 // NEXT_PUBLIC_ prefix exposes this variable to the browser
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ; // Default to localhost if not set
+export const API_REQUEST_TIMEOUT = 10000;
+
+axios.defaults.timeout = API_REQUEST_TIMEOUT;
+
+export const fetchWithTimeout = async (url, options = {}, timeoutMs = API_REQUEST_TIMEOUT) => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+};
 
 const API_ENDPOINTS = {
   // Authentication
