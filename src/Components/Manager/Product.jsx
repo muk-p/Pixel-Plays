@@ -124,21 +124,9 @@ const ProductManager = ({ search = '' }) => {
 
   const openForm = async (product = null) => {
     if (product) {
-      let activeProduct = { ...product };
-
-      try {
-        setLoading(true);
-        // 👈 3. Updated dynamic deep-fetch endpoint path parameters to use slug targeting strings
-        const identifier = product.slug || product.id;
-        const res = await axios.get(`${API_URL}/${identifier}`);
-        
-        activeProduct = { ...activeProduct, ...(res.data.product || res.data) };
-      } catch (err) {
-        console.error("Failed to load deep single product profile info:", err);
-        alert("Could not load rich specifications. Editing raw base product from memory cache.");
-      } finally {
-        setLoading(false);
-      }
+      // The admin list is the authoritative no-cache edit payload. Do not replace
+      // it with the public cached product response, which can hide fresh descriptions.
+      const activeProduct = { ...product };
 
       let parsedFeatures = [];
       let parsedSpecs = {};
@@ -164,7 +152,7 @@ const ProductManager = ({ search = '' }) => {
       setFormData({
         ...initialFormState,
         ...activeProduct,
-        description: activeProduct.description ?? product.description ?? '',
+        description: activeProduct.description ?? '',
         features: parsedFeatures,
         specs: parsedSpecs,
         image_file: null 
