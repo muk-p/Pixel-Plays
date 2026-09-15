@@ -26,7 +26,7 @@ const ProductOverview = ({ product, quantity, setQuantity, handleAddToCart, form
           </h3>
         </div>
 
-        <div className="max-h-48 md:max-h-56 overflow-y-auto pr-2 scrollbar-thin text-gray-700 text-xs md:text-sm leading-relaxed space-y-3">
+        <div className="max-h-48 md:max-h-56 mobile-scroll-y pr-2 scrollbar-thin text-gray-700 text-xs md:text-sm leading-relaxed space-y-3">
           {product.description?.split('\n').filter((paragraph) => paragraph.trim() !== '').map((paragraph, idx) => (
             <p key={idx}>{paragraph}</p>
           ))}

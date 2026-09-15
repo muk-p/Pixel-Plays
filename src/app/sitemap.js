@@ -1,7 +1,7 @@
 import { API_BASE_URL } from '@/config/api';
 import https from 'https'; // 1. Import Node's native HTTPS module
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function sitemap() {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pixelplays.co.ke';
@@ -25,8 +25,8 @@ export default async function sitemap() {
 
   // Dynamic Fetch: Store Products
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shopping/products`, { 
-      cache: 'no-store',
+    const response = await fetch(`${API_BASE_URL}/api/shopping/products/sitemap`, {
+      next: { revalidate: 3600 },
       agent: agent // 3. Inject the agent directly here
     }); // Use 'as any' only if you encounter a strict TypeScript compiler warning
 
@@ -35,8 +35,8 @@ export default async function sitemap() {
       const products = Array.isArray(data) ? data : (data.products || []);
 
       productRoutes = products.map((product) => ({
-        url: `${baseUrl}/product/${product.id}`,
-        lastModified: new Date(product.updated_at || product.updatedAt || Date.now()),
+        url: `${baseUrl}/product/${product.slug}`,
+        lastModified: product.updated_at ? new Date(product.updated_at) : undefined,
         changeFrequency: 'weekly',
         priority: 0.8,
       }));
@@ -49,8 +49,8 @@ export default async function sitemap() {
 
   // Dynamic Fetch: Gaming Codes / Digital Keys
   try {
-    const response = await fetch(`${API_BASE_URL}/api/shopping/gaming-codes`, { 
-      cache: 'no-store',
+    const response = await fetch(`${API_BASE_URL}/api/gaming-codes`, {
+      next: { revalidate: 3600 },
       agent: agent // 4. Inject the agent here too
     });
 

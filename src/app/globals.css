@@ -72,6 +72,21 @@ body {
   transition: background-color 250ms ease, color 250ms ease;
 }
 
+/* Keep nested mobile scrollers responsive on touch devices, including iOS. */
+.mobile-scroll-y {
+  overflow-y: auto;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+}
+
+.mobile-scroll-x {
+  overflow-x: auto;
+  touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+
 /* Base states for inputs without overriding Tailwind background classes */
 input, textarea, select {
   color: var(--foreground);

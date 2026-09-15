@@ -7,6 +7,7 @@ import ProductForm from './ProductForm';
 import ProductList from './ProductList';
 
 const API_URL = API_ENDPOINTS.SHOPPING.PRODUCTS;
+const ADMIN_PRODUCTS_URL = API_ENDPOINTS.SHOPPING.ADMIN_PRODUCTS;
 
 const ProductManager = ({ search = '' }) => {
   const [products, setProducts] = useState([]);
@@ -39,9 +40,12 @@ const ProductManager = ({ search = '' }) => {
 
   // ADMINISTRATIVE FIX: Parses the newly optimization-grouped categoric arrays
   // and flattens them cleanly for table inventory lists
-  const fetchProducts = async () => {
+  async function fetchProducts() {
     try {
-      const res = await axios.get(API_URL);
+      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      const res = await axios.get(ADMIN_PRODUCTS_URL, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {}
+      });
       const catalogData = res.data.catalog || [];
       
       // Flatten out the [category, items] matrices back into a direct plain array map
@@ -57,7 +61,7 @@ const ProductManager = ({ search = '' }) => {
     } catch (err) {
       console.error("Error fetching inventory data:", err);
     }
-  };
+  }
 
   const handleImageChange = (e) => {
     const file = e.target?.files?.[0] || e.target?.files?.[0] || e.files?.[0];
@@ -128,7 +132,7 @@ const ProductManager = ({ search = '' }) => {
         const identifier = product.slug || product.id;
         const res = await axios.get(`${API_URL}/${identifier}`);
         
-        activeProduct = res.data.product || res.data;
+        activeProduct = { ...activeProduct, ...(res.data.product || res.data) };
       } catch (err) {
         console.error("Failed to load deep single product profile info:", err);
         alert("Could not load rich specifications. Editing raw base product from memory cache.");
@@ -160,7 +164,7 @@ const ProductManager = ({ search = '' }) => {
       setFormData({
         ...initialFormState,
         ...activeProduct,
-        description: activeProduct.description || '', 
+        description: activeProduct.description ?? product.description ?? '',
         features: parsedFeatures,
         specs: parsedSpecs,
         image_file: null 
@@ -220,15 +224,15 @@ const ProductManager = ({ search = '' }) => {
   };
 
   // 👈 2. Updated parameter profile assignment from raw database 'id' to 'slug' string
-  const handleDelete = async (slug, idFallback = null) => {
+  const handleDelete = async (product) => {
     if (typeof window === 'undefined') return;
     if (!window.confirm("Are you sure you want to delete this product?")) return;
     
     const token = localStorage.getItem('token');
     const config = { headers: { Authorization: `Bearer ${token}` } };
     
-    // Fall back to numeric id indexation safely if working with non-migrated data structures
-    const identifier = slug || idFallback;
+    const identifier = product?.slug || product?.id;
+    if (!identifier) return;
 
     try {
       // 👈 3. Hit the updated Express DELETE product route path targeting your product slug

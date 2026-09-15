@@ -11,8 +11,12 @@ const CartSection = () => {
   const { items: cartItems, totalPrice, removeItem, clearCart, formatCurrency, updateQuantity } = useCart();
 
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = isOpen ? 'hidden' : previousOverflow;
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
   }, [isOpen]);
 
   const handleCheckout = () => {
@@ -44,7 +48,7 @@ const CartSection = () => {
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsOpen(false)} />
           
-          <div className="relative w-full max-w-md bg-(--surface) shadow-2xl rounded-3xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-(--border)">
+          <div className="relative w-full max-w-md max-h-[calc(100dvh-2rem)] bg-(--surface) shadow-2xl rounded-3xl overflow-hidden animate-in fade-in zoom-in duration-200 border border-(--border)">
             <div className="px-6 py-4 border-b flex justify-between items-center bg-purple-50/50">
               <h3 className="text-lg font-bold text-foreground">Your Cart</h3>
               <button onClick={() => setIsOpen(false)} className="p-1 hover:bg-(--surface-alt) rounded-full transition-colors">
@@ -54,7 +58,7 @@ const CartSection = () => {
               </button>
             </div>
 
-            <div className="max-h-[60vh] overflow-y-auto px-2">
+            <div className="max-h-[60dvh] mobile-scroll-y px-2">
               {cartItems.length === 0 ? (
                 <div className="py-20 text-center">
                    <p className="text-(--muted) text-sm italic">Your cart is currently empty</p>

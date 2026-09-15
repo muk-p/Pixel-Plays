@@ -12,7 +12,7 @@ const Checkout = () => {
   const isProcessingOrComplete = form.orderId !== null || form.success;
 
   return (
-    <div className="min-h-[calc(100vh-53px)] w-full bg-gray-50 flex items-center justify-center py-8 px-4 overflow-y-auto">
+    <div className="min-h-[calc(100vh-53px)] w-full bg-gray-50 flex items-center justify-center py-8 px-4 mobile-scroll-y">
       {isProcessingOrComplete ? (
         <CheckoutSuccess 
           orderId={form.orderId} 

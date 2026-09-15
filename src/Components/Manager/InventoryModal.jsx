@@ -66,7 +66,7 @@ const InventoryModal = ({
 
           <div>
             <h3 className="text-lg font-bold mb-4">Current Inventory ({inventory.length} codes)</h3>
-            <div className="max-h-96 overflow-y-auto border border-gray-200 rounded-xl">
+            <div className="max-h-96 mobile-scroll-y border border-gray-200 rounded-xl">
               {inventory.length === 0 ? (
                 <div className="p-8 text-center text-gray-500">
                   No codes in inventory yet. Add some codes above.

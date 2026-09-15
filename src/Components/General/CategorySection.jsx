@@ -95,7 +95,7 @@ const CategorySection = () => {
 
   return (
     <div className="relative w-full bg-white py-1.5 border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-4 overflow-x-auto no-scrollbar touch-pan-x">
+      <div className="max-w-7xl mx-auto px-4 mobile-scroll-x no-scrollbar">
         <div className="flex items-center gap-6 md:gap-8 min-w-max py-0.5">
           {categories.map((category) => {
             const isActive = activeCategory === category.id;

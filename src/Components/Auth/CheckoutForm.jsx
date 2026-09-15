@@ -18,7 +18,7 @@ const CheckoutForm = ({
           Items in Order
         </label>
         
-        <div className="max-h-40 overflow-y-auto border border-(--border) rounded-2xl divide-y divide-[rgba(148,163,184,0.2)] bg-(--surface-alt) pr-1 JSON-scrollbar">
+        <div className="max-h-40 mobile-scroll-y border border-(--border) rounded-2xl divide-y divide-[rgba(148,163,184,0.2)] bg-(--surface-alt) pr-1 JSON-scrollbar">
           {items && items.length > 0 ? (
             items.map((item) => (
               <div key={item.id} className="flex items-center justify-between p-3 text-xs font-medium text-foreground">
