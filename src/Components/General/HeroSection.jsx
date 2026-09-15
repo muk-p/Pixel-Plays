@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import axios from 'axios';
 import { API_ENDPOINTS, getImageUrl } from '../../config/api';
@@ -14,9 +14,8 @@ const HeroSection = () => {
   const [autoPauseUntil, setAutoPauseUntil] = useState(0);
   const [hasMounted, setHasMounted] = useState(false);
   
-  // Tracking states for touch coordinates
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const touchStartRef = useRef(null);
+  const touchEndRef = useRef(null);
 
   // SAFE MOUNT TRACKER
   useEffect(() => {
@@ -70,16 +69,19 @@ const HeroSection = () => {
 
   const handleTouchStart = (e) => {
     pauseAutoAdvance();
-    setTouchEnd(null); // Reset before tracking new swipe
-    setTouchStart(e.targetTouches[0].clientX);
+    touchEndRef.current = null;
+    touchStartRef.current = e.targetTouches[0].clientX;
   };
 
   const handleTouchMove = (e) => {
-    setTouchEnd(e.targetTouches[0].clientX);
+    touchEndRef.current = e.targetTouches[0].clientX;
   };
 
   const handleTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
+    const touchStart = touchStartRef.current;
+    const touchEnd = touchEndRef.current;
+
+    if (touchStart === null || touchEnd === null) return;
     
     const distance = touchStart - touchEnd;
     const isLeftSwipe = distance > minSwipeDistance;
@@ -90,6 +92,9 @@ const HeroSection = () => {
     } else if (isRightSwipe) {
       handlePrev();
     }
+
+    touchStartRef.current = null;
+    touchEndRef.current = null;
   };
 
   // HIGH PERFORMANCE SKELETON PLACEHOLDER

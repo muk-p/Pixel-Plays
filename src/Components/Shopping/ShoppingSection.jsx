@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useSearchParams } from 'next/navigation'; 
 import axios from 'axios';
@@ -23,9 +23,6 @@ const ShoppingCatalog = ({ searchQuery }) => {
   const [catalog, setCatalog] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  const previousCategoryRef = useRef(activeCategory);
-  const sectionRootRef = useRef(null); 
-
   // INITIAL LOAD ENGINE: Pulls grouped categories from the backend database
   useEffect(() => {
     const fetchGroupedCatalog = async () => {
@@ -84,35 +81,6 @@ const ShoppingCatalog = ({ searchQuery }) => {
     });
   }, [catalog, searchQuery]);
 
-  // Snap window focus down to grid layout root upon search query updates
-  useEffect(() => {
-    if (loading || !searchQuery.trim()) return;
-    const timer = setTimeout(() => {
-      if (sectionRootRef.current) {
-        sectionRootRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [searchQuery, loading]);
-
-  // Smooth scroll target alignment when a filter parameter mounts
-  useEffect(() => {
-    if (loading) return;
-    const hasCategoryChanged = previousCategoryRef.current !== activeCategory;
-    previousCategoryRef.current = activeCategory;
-
-    if (!hasCategoryChanged || !activeCategory) return;
-
-    const targetId = `category-${formatCategoryId(activeCategory)}`;
-    const targetElement = document.getElementById(targetId);
-    
-    if (targetElement) {
-      setTimeout(() => {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 50);
-    }
-  }, [activeCategory, loading]);
-
   // ANIMATED BRAND LOADING SCREEN
   if (loading) {
     return (
@@ -126,7 +94,6 @@ const ShoppingCatalog = ({ searchQuery }) => {
 return (
     <div 
       id="shopping-section-root" 
-      ref={sectionRootRef}
       className="w-full max-w-full space-y-14 py-8 overflow-visible bg-background scroll-mt-16 transition-colors duration-300" 
     >
       {sortedCategoryEntries.map(([category, items], categoryIndex) => {
