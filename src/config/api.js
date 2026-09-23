@@ -2,8 +2,9 @@
 import { rateLimitedRequest } from '../utils/rateLimiter';
 import axios from 'axios';
 
-// NEXT_PUBLIC_ prefix exposes this variable to the browser
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL ; // Default to localhost if not set
+// NEXT_PUBLIC_ prefix exposes this variable to the browser. An empty base keeps
+// local and same-origin deployments on the Next.js API rewrite when no env var is set.
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 export const API_REQUEST_TIMEOUT = 10000;
 
 axios.defaults.timeout = API_REQUEST_TIMEOUT;
