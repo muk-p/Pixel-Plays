@@ -12,6 +12,9 @@ export const metadata = {
   },
   description:
     'Shop authentic PlayStation, Xbox, and Nintendo consoles plus digital gaming codes, wallet top-ups, and accessories in Kenya with fast delivery and secure M-Pesa checkout.',
+  verification: {
+    google: 'iXTyrj1i2lgWxk98eQp9kmFsnSe_HvXe_OtRTR6d9IA',
+  },
   keywords: [
     'gaming consoles kenya',
     'ps5 kenya',
