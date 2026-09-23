@@ -37,8 +37,7 @@ const ProductForm = ({
   }, [formData.id, formData.slug, formData.features, formData.specs]); 
 
   // Intercept form submit to pack local string inputs back into clean structural parameters
-  const previewSrc = imagePreview ? getImageUrl(imagePreview) : null;
-  const useUnoptimizedPreview = Boolean(previewSrc && isRemoteImageSource(previewSrc));
+  const previewImages = Array.isArray(imagePreview) ? imagePreview : (imagePreview ? [imagePreview] : []);
 
   const handleSubmitIntercept = (e) => {
     e.preventDefault();
@@ -82,15 +81,14 @@ const ProductForm = ({
         const items = e.clipboardData?.items;
         if (!items) return;
 
+        const pastedImages = [];
         for (let i = 0; i < items.length; i++) {
           if (items[i].type.indexOf('image') !== -1) {
             const file = items[i].getAsFile();
-            if (file) {
-              // Update the frontend visual preview box immediately
-              handleImageChange({ target: { files: [file] } });
-            }
+            if (file) pastedImages.push(file);
           }
         }
+        if (pastedImages.length) handleImageChange({ target: { files: pastedImages } });
       }}
       className="bg-white rounded-4xl p-5 md:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-300"
     >
@@ -101,23 +99,30 @@ const ProductForm = ({
           <div>
             <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Product Image</label>
             <div className="mt-2 border-2 border-dashed border-gray-200 rounded-4xl aspect-square flex flex-col items-center justify-center p-2 relative overflow-hidden bg-gray-50">
-              {imagePreview ? (
-                <div className="w-full h-full relative">
-                  <Image 
-                    src={previewSrc} 
-                    className="object-contain" 
-                    alt="Preview UI upload stream visual illustration frame layout" 
-                    fill
-                    sizes="(max-w-7xl) 50vw, 33vw"
-                    unoptimized={useUnoptimizedPreview}
-                  />
+              {previewImages.length ? (
+                <div className="w-full h-full grid grid-cols-2 gap-2 p-2">
+                  {previewImages.map((image, index) => {
+                    const previewSrc = getImageUrl(image);
+                    return (
+                      <div key={`${previewSrc}-${index}`} className="relative min-h-0 overflow-hidden rounded-xl bg-white">
+                        <Image 
+                          src={previewSrc}
+                          className="object-contain"
+                          alt={`Product image ${index + 1}`}
+                          fill
+                          sizes="(max-w-7xl) 25vw, 20vw"
+                          unoptimized={isRemoteImageSource(previewSrc)}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center p-4">
                   <p className="text-gray-400 text-xs font-bold">Click or drag to upload</p>
                 </div>
               )}
-              <input type="file" onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
+              <input type="file" accept="image/*" multiple onChange={handleImageChange} className="absolute inset-0 opacity-0 cursor-pointer" />
             </div>
           </div>
 

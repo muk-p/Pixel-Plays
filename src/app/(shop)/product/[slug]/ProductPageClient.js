@@ -16,7 +16,8 @@ export default function ProductPageClient({ product }) {
   // Early safeguard in case product data fails to mount correctly
   if (!product) return null;
 
-  const displayImage = getImageUrl(product.image_url);
+  const productImages = product.images?.length ? product.images : [product.image_url].filter(Boolean);
+  const displayImage = getImageUrl(productImages[0]);
   
   // Clean, safe parsing relying on your updated backend sync data format
   const features = Array.isArray(product.features) ? product.features : [];
@@ -39,7 +40,7 @@ export default function ProductPageClient({ product }) {
       </div>
 
       <main className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 pb-20">
-        <ProductImagePanel image={displayImage} alt={product.name} />
+        <ProductImagePanel image={displayImage} images={productImages} alt={product.name} />
 
         <div className="flex flex-col">
           <ProductOverview

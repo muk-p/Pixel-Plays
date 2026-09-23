@@ -24,6 +24,7 @@ const ProductManager = ({ search = '' }) => {
     old_price: '',
     stock: '', 
     image_url: '', 
+    images: [],
     description: '',
     features: [],
     is_hero: false,
@@ -64,10 +65,10 @@ const ProductManager = ({ search = '' }) => {
   }
 
   const handleImageChange = (e) => {
-    const file = e.target?.files?.[0] || e.target?.files?.[0] || e.files?.[0];
-    if (file) {
-      setImagePreview(URL.createObjectURL(file));
-      setFormData(prev => ({ ...prev, image_file: file }));
+    const files = Array.from(e.target?.files || e.files || []).slice(0, 4);
+    if (files.length) {
+      setImagePreview(files.map(file => URL.createObjectURL(file)));
+      setFormData(prev => ({ ...prev, image_files: files }));
     }
   };
 
@@ -82,13 +83,15 @@ const ProductManager = ({ search = '' }) => {
     Object.keys(activeFormData).forEach(key => {
       if (key === 'id') return; // Pass slug values instead of primary keys
       
-      if (key === 'image_file') {
-        if (activeFormData.image_file) {
-          data.append('image', activeFormData.image_file);
-        }
+      if (key === 'image_files') {
+        activeFormData.image_files?.forEach(file => data.append('images', file));
       } else if (key === 'image_url') {
-        if (!activeFormData.image_file && activeFormData.image_url) {
+        if (!activeFormData.image_files?.length && activeFormData.image_url) {
           data.append('image_url', activeFormData.image_url);
+        }
+      } else if (key === 'images') {
+        if (!activeFormData.image_files?.length && activeFormData.images?.length) {
+          data.append(key, JSON.stringify(activeFormData[key]));
         }
       } else if (key === 'features' || key === 'specs') {
         data.append(key, JSON.stringify(activeFormData[key] || (key === 'features' ? [] : {})));
@@ -100,8 +103,7 @@ const ProductManager = ({ search = '' }) => {
     try {
       const config = {
         headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          Authorization: `Bearer ${token}`
         }
       };
 
@@ -155,16 +157,14 @@ const ProductManager = ({ search = '' }) => {
         description: activeProduct.description ?? '',
         features: parsedFeatures,
         specs: parsedSpecs,
-        image_file: null 
+        image_files: []
       });
 
-      const fullUrl = activeProduct.image_url?.startsWith('/uploads') 
-        ? getImageUrl(activeProduct.image_url) 
-        : activeProduct.image_url;
-      setImagePreview(fullUrl);
+      const productImages = activeProduct.images?.length ? activeProduct.images : [activeProduct.image_url].filter(Boolean);
+      setImagePreview(productImages.map(image => getImageUrl(image)));
     } else {
       setFormData(initialFormState);
-      setImagePreview(null);
+      setImagePreview([]);
     }
     setIsEditing(true);
   };
@@ -172,7 +172,7 @@ const ProductManager = ({ search = '' }) => {
   const closeForm = () => {
     setIsEditing(false);
     setFormData(initialFormState);
-    setImagePreview(null);
+    setImagePreview([]);
   };
   const toggleHero = async (product) => {
     setLoading(true);
@@ -198,8 +198,7 @@ const ProductManager = ({ search = '' }) => {
       const identifier = product.slug || product.id;
       await axios.put(`${API_URL}/${identifier}`, data, {
         headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          Authorization: `Bearer ${token}`
         }
       });
       await fetchProducts();
