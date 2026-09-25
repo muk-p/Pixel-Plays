@@ -78,8 +78,8 @@ const Footer = () => {
           <div className="text-xs text-(--muted) text-center sm:text-left order-2 sm:order-1">
             <p>© {year} Pixel Plays Kenya. All rights reserved.</p>
             <div className="flex justify-center sm:justify-start gap-4 mt-2 font-medium">
-              <span className="hover:text-foreground transition-colors cursor-pointer">Privacy Policy</span>
-              <span className="hover:text-foreground transition-colors cursor-pointer">Terms of Service</span>
+              <a href="/no-return-policy" className="hover:text-foreground transition-colors">No Return Policy</a>
+              <a href="/terms-and-agreements" className="hover:text-foreground transition-colors">Terms & Agreements</a>
             </div>
           </div>
 
