@@ -91,8 +91,11 @@ const ProductManager = ({ search = '' }) => {
           data.append('image_url', activeFormData.image_url);
         }
       } else if (key === 'images') {
-        if (!activeFormData.image_files?.length && activeFormData.images?.length) {
-          data.append(key, JSON.stringify(activeFormData[key]));
+        if (!activeFormData.image_files?.length) {
+          const images = activeFormData.images?.length
+            ? activeFormData.images
+            : activeFormData.image_url ? [activeFormData.image_url] : [];
+          data.append(key, JSON.stringify(images));
         }
       } else if (key === 'features' || key === 'specs') {
         data.append(key, JSON.stringify(activeFormData[key] || (key === 'features' ? [] : {})));
