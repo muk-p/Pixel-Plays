@@ -17,6 +17,7 @@ const ProductManager = ({ search = '' }) => {
   const initialFormState = { 
     id: null,
     slug: '', // 👈 1. Added slug support to state properties initialization block
+    original_slug: '',
     name: '', 
     brand: '', 
     category: '',
@@ -81,7 +82,7 @@ const ProductManager = ({ search = '' }) => {
     const data = new FormData();
     
     Object.keys(activeFormData).forEach(key => {
-      if (key === 'id') return; // Pass slug values instead of primary keys
+      if (key === 'id' || key === 'original_slug') return; // Pass slug values instead of primary keys
       
       if (key === 'image_files') {
         activeFormData.image_files?.forEach(file => data.append('images', file));
@@ -108,9 +109,9 @@ const ProductManager = ({ search = '' }) => {
       };
 
       // 👈 2. Updated PUT request parameters to use the active product's slug string
-      if (activeFormData.id || activeFormData.slug) {
-        const identifier = activeFormData.slug || activeFormData.id;
-        await axios.put(`${API_URL}/${identifier}`, data, config);
+      if (activeFormData.original_slug || activeFormData.id) {
+        const identifier = activeFormData.original_slug || activeFormData.id;
+        await axios.put(`${API_URL}/${encodeURIComponent(identifier)}`, data, config);
       } else {
         await axios.post(API_URL, data, config);
       }
@@ -154,6 +155,7 @@ const ProductManager = ({ search = '' }) => {
       setFormData({
         ...initialFormState,
         ...activeProduct,
+        original_slug: activeProduct.slug,
         description: activeProduct.description ?? '',
         features: parsedFeatures,
         specs: parsedSpecs,
@@ -186,6 +188,8 @@ const ProductManager = ({ search = '' }) => {
       } else if (key === 'features' || key === 'specs') {
         const value = typeof product[key] === 'string' ? JSON.parse(product[key]) : product[key];
         data.append(key, JSON.stringify(value || (key === 'features' ? [] : {})));
+      } else if (key === 'images') {
+        data.append(key, JSON.stringify(product[key] || []));
       } else if (key === 'image_url') {
         data.append(key, product[key] || '');
       } else {
@@ -196,7 +200,7 @@ const ProductManager = ({ search = '' }) => {
     try {
       // 👈 1. Updated endpoint path parameter targeting to look up via product.slug
       const identifier = product.slug || product.id;
-      await axios.put(`${API_URL}/${identifier}`, data, {
+      await axios.put(`${API_URL}/${encodeURIComponent(identifier)}`, data, {
         headers: { 
           Authorization: `Bearer ${token}`
         }
@@ -223,7 +227,7 @@ const ProductManager = ({ search = '' }) => {
 
     try {
       // 👈 3. Hit the updated Express DELETE product route path targeting your product slug
-      await axios.delete(`${API_URL}/${identifier}`, config);
+      await axios.delete(`${API_URL}/${encodeURIComponent(identifier)}`, config);
       
       // 👈 4. Filter state using slugs or matching target fallback primary keys
       setProducts(products.filter(p => p.slug !== identifier && p.id !== identifier));
@@ -272,7 +276,7 @@ const ProductManager = ({ search = '' }) => {
             productCount={products.length}
             openForm={openForm}
             // Passing down our newly slugified reference method handler cleanly
-            handleDelete={(p) => handleDelete(p.slug, p.id)}
+            handleDelete={handleDelete}
             toggleHero={toggleHero}
             loading={loading}
           />

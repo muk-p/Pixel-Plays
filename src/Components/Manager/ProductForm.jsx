@@ -242,7 +242,7 @@ const ProductForm = ({
           disabled={loading}
           className="order-1 sm:order-2 flex-2 flex items-center justify-center min-h-15 bg-green-600 text-white rounded-2xl font-bold shadow-lg active:scale-95 disabled:bg-gray-300 transition-all"
         >
-          {loading ? "Processing..." : (formData.id ? 'Update Product' : 'Confirm & Post')}
+          {loading ? "Processing..." : (formData.original_slug || formData.id ? 'Update Product' : 'Confirm & Post')}
         </button>
 
         <button 
