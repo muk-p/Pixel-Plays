@@ -15,9 +15,9 @@ const formatCategoryId = (categoryId) =>
     .replace(/[^a-z0-9]+/g, '-');
 
 const phoneBrandImages = {
-  samsung: { src: '/uploads/Galaxy%20s26.jpg', alt: 'Samsung Galaxy phone' },
-  apple: { src: '/uploads/iPhone-18-Pro-Dark-Cherry-Feature.jpg', alt: 'Apple iPhone' },
-  nothing: { src: '/uploads/Nothing%20phones.jpg', alt: 'Nothing phones' },
+  samsung: { src: '/brands/phones/samsung-galaxy.jpg', alt: 'Samsung Galaxy phone' },
+  apple: { src: '/brands/phones/apple-iphone.jpg', alt: 'Apple iPhone' },
+  nothing: { src: '/brands/phones/nothing-phones.jpg', alt: 'Nothing phones' },
 };
 
 // Internal component to safely isolate and read client URL search parameters
@@ -173,8 +173,7 @@ return (
                       {brandImage && (
                         <span className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-(--surface-alt)">
                           <Image
-                            loader={localImageLoader}
-                            src={getImageUrl(brandImage.src)}
+                            src={brandImage.src}
                             alt={brandImage.alt}
                             fill
                             sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
