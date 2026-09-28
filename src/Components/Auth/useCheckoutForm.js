@@ -235,7 +235,11 @@ export const useCheckoutForm = () => {
         // ROUTE B: PROCESS PHYSICAL ITEMS
         // ==========================================
         const orderPayload = {
-          items: items.map((item) => ({ productId: Number(item.id), quantity: Number(item.quantity) })),
+          items: items.map((item) => ({
+            productId: Number(item.id),
+            variantId: item.phoneVariantId ? Number(item.phoneVariantId) : undefined,
+            quantity: Number(item.quantity),
+          })),
           customerName: fullName || user?.name || '',
           address: hasHardware ? address : 'Digital Delivery',
           paymentMethod: 'M-PESA',

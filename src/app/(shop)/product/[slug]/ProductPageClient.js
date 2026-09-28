@@ -12,6 +12,7 @@ import ProductSpecsBlock from '@/Components/Shopping/ProductSpecsBlock';
 export default function ProductPageClient({ product }) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariantId, setSelectedVariantId] = useState(product?.variants?.[0]?.id ?? '');
 
   // Early safeguard in case product data fails to mount correctly
   if (!product) return null;
@@ -22,10 +23,18 @@ export default function ProductPageClient({ product }) {
   // Clean, safe parsing relying on your updated backend sync data format
   const features = Array.isArray(product.features) ? product.features : [];
   const specs = (product.specs && typeof product.specs === 'object') ? product.specs : {};
+  const selectedVariant = product.variants?.find((variant) => String(variant.id) === String(selectedVariantId));
+  const purchaseProduct = selectedVariant
+    ? { ...product, price: Number(selectedVariant.price), stock: Number(selectedVariant.stock) }
+    : product;
 
   const handleAddToCart = () => {
     addToCart({
-      ...product,
+      ...purchaseProduct,
+      phoneVariantId: selectedVariant?.id || null,
+      variantLabel: selectedVariant?.variant_label || '',
+      variantMarket: selectedVariant?.market || '',
+      variantWarranty: selectedVariant?.warranty || '',
       quantity,
     });
   };
@@ -44,7 +53,10 @@ export default function ProductPageClient({ product }) {
 
         <div className="flex flex-col">
           <ProductOverview
-            product={product}
+            product={purchaseProduct}
+            variants={product.variants || []}
+            selectedVariantId={selectedVariantId}
+            onSelectVariant={setSelectedVariantId}
             quantity={quantity}
             setQuantity={setQuantity}
             handleAddToCart={handleAddToCart}

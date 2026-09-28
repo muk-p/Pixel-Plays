@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useMemo, useEffect } from 'react';
 
 const CartContext = createContext();
+const cartIdentity = (item) => item.cartKey || `${item.id}:${item.phoneVariantId || 'product'}`;
 
 export const CartProvider = ({ children }) => {
   // Initialize with an empty array to match the server's pre-rendered shell safely
@@ -55,7 +56,7 @@ export const CartProvider = ({ children }) => {
       return;
     }
     setItems(prev => prev.map(item => 
-      item.id === id ? { ...item, quantity: newQuantity } : item
+      cartIdentity(item) === id ? { ...item, quantity: newQuantity } : item
     ));
   };
 
@@ -66,13 +67,14 @@ export const CartProvider = ({ children }) => {
       : Number(product.price);
 
     const incomingQuantity = Number(product.quantity) || 1;
+    const cartKey = cartIdentity(product);
 
     setItems((prev) => {
-      const existingItem = prev.find(item => item.id === product.id);
+      const existingItem = prev.find(item => cartIdentity(item) === cartKey);
 
       if (existingItem) {
         return prev.map(item =>
-          item.id === product.id 
+          cartIdentity(item) === cartKey
             ? { ...item, quantity: item.quantity + incomingQuantity } 
             : item
         );
@@ -80,6 +82,7 @@ export const CartProvider = ({ children }) => {
 
       return [...prev, {
         ...product,
+        cartKey,
         price: numericPrice,
         quantity: incomingQuantity
       }];
@@ -90,7 +93,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeItem = (id) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+    setItems(prev => prev.filter(item => cartIdentity(item) !== id));
   };
 
   const clearCart = () => {

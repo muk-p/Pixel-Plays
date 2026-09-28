@@ -65,9 +65,12 @@ const CartSection = () => {
                 </div>
               ) : (
                 cartItems.map((item) => (
-                  <div key={item.id} className="group flex justify-between items-center p-4 border-b border-(--border) hover:bg-(--surface)">
+                  <div key={item.cartKey || `${item.id}:product`} className="group flex justify-between items-center p-4 border-b border-(--border) hover:bg-(--surface)">
                     <div className="flex flex-col flex-1">
                       <span className="text-sm font-semibold text-foreground">{item.name}</span>
+                      {item.variantLabel && (
+                        <span className="text-xs text-(--muted)">{item.variantLabel} · {item.variantMarket} · {item.variantWarranty}</span>
+                      )}
                       <span className="text-sm text-purple-600 font-bold">{formatCurrency(item.price)}</span>
                     </div>
 
@@ -75,7 +78,7 @@ const CartSection = () => {
                     <div className="flex items-center gap-3 mr-4 bg-(--surface-alt) rounded-lg p-1">
                       <button 
                         type="button"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.cartKey || `${item.id}:product`, item.quantity - 1)}
                         className="w-8 h-8 flex items-center justify-center bg-(--surface) rounded-md shadow-sm hover:text-purple-600 transition-colors"
                       >
                         -
@@ -83,14 +86,14 @@ const CartSection = () => {
                       <span className="text-sm font-bold w-4 text-center">{item.quantity}</span>
                       <button 
                         type="button"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.cartKey || `${item.id}:product`, item.quantity + 1)}
                         className="w-8 h-8 flex items-center justify-center bg-(--surface) rounded-md shadow-sm hover:text-purple-600 transition-colors"
                       >
                         +
                       </button>
                     </div>
 
-                    <button type="button" onClick={() => removeItem(item.id)} className="p-2 text-(--muted) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
+                    <button type="button" onClick={() => removeItem(item.cartKey || `${item.id}:product`)} className="p-2 text-(--muted) hover:text-red-500 hover:bg-red-50 rounded-lg transition-all">
                       <svg xmlns="http://w3.org" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>

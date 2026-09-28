@@ -29,6 +29,11 @@ const CheckoutForm = ({
                   <span className="truncate font-semibold text-foreground">
                     {item.name}
                   </span>
+                  {item.variantLabel && (
+                    <span className="truncate text-[10px] text-(--muted)">
+                      {item.variantLabel} · {item.variantMarket} · {item.variantWarranty}
+                    </span>
+                  )}
                 </div>
                 <span className="font-bold text-foreground shrink-0 font-mono">
                   KES {Number((item.price || 0) * (item.quantity || 1)).toLocaleString()}

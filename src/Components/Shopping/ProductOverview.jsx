@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-const ProductOverview = ({ product, quantity, setQuantity, handleAddToCart, formatCurrency }) => {
+const ProductOverview = ({ product, variants = [], selectedVariantId, onSelectVariant, quantity, setQuantity, handleAddToCart, formatCurrency }) => {
   if (!product) return null;
 
   return (
@@ -36,6 +36,26 @@ const ProductOverview = ({ product, quantity, setQuantity, handleAddToCart, form
           )}
         </div>
       </div>
+
+      {variants.length > 0 && (
+        <div className="mb-6">
+          <label htmlFor="phone-variant" className="mb-2 block text-xs font-bold uppercase tracking-wider text-gray-700">
+            Configuration
+          </label>
+          <select
+            id="phone-variant"
+            value={selectedVariantId}
+            onChange={(event) => onSelectVariant(event.target.value)}
+            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm font-semibold text-gray-900 outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-200"
+          >
+            {variants.map((variant) => (
+              <option key={variant.id} value={variant.id}>
+                {variant.variant_label} · {variant.market} · {variant.warranty} · {formatCurrency(variant.price)}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* Pricing Information */}
       <div className="flex items-center gap-4 mb-8">

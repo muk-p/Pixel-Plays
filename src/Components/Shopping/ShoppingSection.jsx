@@ -19,6 +19,7 @@ const ShoppingCatalog = ({ searchQuery }) => {
   const pathname = usePathname();
   const searchParams = useSearchParams(); 
   const activeCategory = searchParams.get('category');
+  const activeBrand = searchParams.get('brand');
   
   const [catalog, setCatalog] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +104,12 @@ return (
           return null; 
         }
 
+        const isPhoneCategory = String(category).toLowerCase() === 'phones';
+        const brandNames = [...new Set(items.map(item => item.brand?.trim()).filter(Boolean))]
+          .sort((first, second) => first.localeCompare(second));
+        const visibleItems = isPhoneCategory && activeBrand
+          ? items.filter(item => item.brand?.toLowerCase() === activeBrand.toLowerCase())
+          : items;
         const sectionId = `category-${formatCategoryId(category)}`;
         const isHighlighted = activeCategory && String(activeCategory).toLowerCase() === String(category).toLowerCase();
         const isCategoryFocused = Boolean(isHighlighted);
@@ -137,13 +144,51 @@ return (
                 className="inline-block transition-transform hover:scale-105 active:scale-95"
               >
                 <span className="text-[11px] font-medium text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full dark:bg-(--surface-alt) dark:text-(--muted) hover:bg-indigo-50 hover:text-indigo-600 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-400 cursor-pointer transition-colors">
-                  {items.length} items
+                  {isPhoneCategory && !activeBrand ? `${brandNames.length} brands` : `${visibleItems.length} items`}
                 </span>
               </Link>
             </div>
-            
-            <div className={`w-full ${isCategoryFocused ? 'grid grid-cols-2 gap-4 pb-5 md:grid-cols-3 lg:grid-cols-4' : 'flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]'}`}>
-              {items.map((item, itemIndex) => {
+
+            {isPhoneCategory && !activeBrand ? (
+              <div className="grid w-full grid-cols-2 gap-3 pb-5 sm:grid-cols-3 lg:grid-cols-4">
+                {brandNames.map(brand => {
+                  const params = new URLSearchParams(searchParams.toString());
+                  params.set('category', category);
+                  params.set('brand', brand);
+                  const brandCount = items.filter(item => item.brand?.toLowerCase() === brand.toLowerCase()).length;
+
+                  return (
+                    <Link
+                      key={brand}
+                      href={`${pathname}?${params.toString()}`}
+                      className="group flex min-h-28 flex-col justify-between border border-slate-200 bg-white p-4 transition-colors hover:border-indigo-400 hover:bg-indigo-50/40 dark:border-(--border) dark:bg-(--surface) dark:hover:border-indigo-500 dark:hover:bg-indigo-950/20"
+                    >
+                      <span className="text-lg font-bold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-foreground dark:group-hover:text-indigo-400">
+                        {brand}
+                      </span>
+                      <span className="text-xs text-slate-500 dark:text-(--muted)">
+                        {brandCount} {brandCount === 1 ? 'model' : 'models'}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            ) : (
+              <>
+                {isPhoneCategory && activeBrand && (
+                  <div className="flex items-center justify-between pb-2">
+                    <p className="text-sm font-semibold text-slate-700 dark:text-foreground">{activeBrand}</p>
+                    <Link
+                      href={`${pathname}?category=${encodeURIComponent(category)}`}
+                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400"
+                    >
+                      All phone brands
+                    </Link>
+                  </div>
+                )}
+                {visibleItems.length ? (
+                  <div className={`w-full ${isCategoryFocused ? 'grid grid-cols-2 gap-4 pb-5 md:grid-cols-3 lg:grid-cols-4' : 'flex overflow-x-auto gap-4 md:gap-5 pb-5 scrollbar-hide scroll-smooth touch-pan-x select-none snap-x snap-mandatory [-webkit-overflow-scrolling:touch]'}`}>
+              {visibleItems.map((item, itemIndex) => {
                 const resolvedImageSrc = getImageUrl(item.image_url);
                 const useUnoptimizedImage = isRemoteImageSource(resolvedImageSrc);
 
@@ -210,7 +255,12 @@ return (
                 </div>
                 );
               })}
-            </div>
+                  </div>
+                ) : (
+                  <p className="py-8 text-sm text-slate-500 dark:text-(--muted)">No phone models found for this brand.</p>
+                )}
+              </>
+            )}
           </div>
         );
       })}
