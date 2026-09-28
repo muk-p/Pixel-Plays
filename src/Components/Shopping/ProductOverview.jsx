@@ -50,7 +50,7 @@ const ProductOverview = ({ product, variants = [], selectedVariantId, onSelectVa
           >
             {variants.map((variant) => (
               <option key={variant.id} value={variant.id}>
-                {variant.variant_label} · {variant.market} · {variant.warranty} · {formatCurrency(variant.price)}
+                {variant.variant_label} · {variant.market} · {variant.warranty} · {formatCurrency(variant.price)} · {variant.stock > 0 ? `${variant.stock} in stock` : 'Out of stock'}
               </option>
             ))}
           </select>

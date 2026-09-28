@@ -23,7 +23,7 @@ export function proxy(request) {
   return NextResponse.next();
 }
 
-// 🎯 CRUCIAL CONFIG: Tells Next.js to ONLY run this security script on your manager routes
+// Restrict manager tools and internal catalog previews to manager sessions.
 export const config = {
-  matcher: ['/manager/:path*'],
+  matcher: ['/manager/:path*', '/preview/phones'],
 };
