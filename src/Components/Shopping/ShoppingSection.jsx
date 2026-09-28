@@ -14,6 +14,12 @@ const formatCategoryId = (categoryId) =>
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-');
 
+const phoneBrandImages = {
+  samsung: { src: '/uploads/Galaxy%20s26.jpg', alt: 'Samsung Galaxy phone' },
+  apple: { src: '/uploads/iPhone-18-Pro-Dark-Cherry-Feature.jpg', alt: 'Apple iPhone' },
+  nothing: { src: '/uploads/Nothing%20phones.jpg', alt: 'Nothing phones' },
+};
+
 // Internal component to safely isolate and read client URL search parameters
 const ShoppingCatalog = ({ searchQuery }) => {
   const pathname = usePathname();
@@ -156,19 +162,33 @@ return (
                   params.set('category', category);
                   params.set('brand', brand);
                   const brandCount = items.filter(item => item.brand?.toLowerCase() === brand.toLowerCase()).length;
+                  const brandImage = phoneBrandImages[brand.toLowerCase()];
 
                   return (
                     <Link
                       key={brand}
                       href={`${pathname}?${params.toString()}`}
-                      className="group flex min-h-28 flex-col justify-between border border-slate-200 bg-white p-4 transition-colors hover:border-indigo-400 hover:bg-indigo-50/40 dark:border-(--border) dark:bg-(--surface) dark:hover:border-indigo-500 dark:hover:bg-indigo-950/20"
+                      className="group flex min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white transition-colors hover:border-indigo-400 dark:border-(--border) dark:bg-(--surface) dark:hover:border-indigo-500"
                     >
-                      <span className="text-lg font-bold text-slate-900 transition-colors group-hover:text-indigo-600 dark:text-foreground dark:group-hover:text-indigo-400">
-                        {brand}
-                      </span>
-                      <span className="text-xs text-slate-500 dark:text-(--muted)">
-                        {brandCount} {brandCount === 1 ? 'model' : 'models'}
-                      </span>
+                      {brandImage && (
+                        <span className="relative block aspect-[16/10] w-full overflow-hidden rounded-xl bg-slate-100 dark:bg-(--surface-alt)">
+                          <Image
+                            loader={localImageLoader}
+                            src={getImageUrl(brandImage.src)}
+                            alt={brandImage.alt}
+                            fill
+                            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                            unoptimized
+                            className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          />
+                          <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-linear-to-t from-black/80 via-black/45 to-transparent px-3 pb-3 pt-10 md:px-4 md:pb-4">
+                            <span className="truncate text-base font-bold text-white md:text-lg">{brand}</span>
+                            <span className="shrink-0 text-xs font-semibold text-white/90">
+                              {brandCount} {brandCount === 1 ? 'model' : 'models'}
+                            </span>
+                          </span>
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
