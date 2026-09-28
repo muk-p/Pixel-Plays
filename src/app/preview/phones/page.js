@@ -2,10 +2,15 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { API_BASE_URL, getImageUrl } from '@/config/api';
 import { useAuth } from '@/Context/AuthContext';
 
-const brands = ['Samsung', 'Apple', 'Nothing'];
+const brands = [
+  { name: 'Samsung', image: '/uploads/Galaxy%20s26.jpg', alt: 'Samsung Galaxy S26' },
+  { name: 'Apple', image: '/uploads/iPhone-18-Pro-Dark-Cherry-Feature.jpg', alt: 'Apple iPhone 18 Pro' },
+  { name: 'Nothing', image: '/uploads/Nothing%20phones.jpg', alt: 'Nothing phones' },
+];
 const formatPrice = (price) => `KSh ${Number(price).toLocaleString('en-KE')}`;
 
 export default function PhoneCatalogPreviewPage() {
@@ -90,24 +95,36 @@ export default function PhoneCatalogPreviewPage() {
       </header>
 
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8 md:py-10">
-        <nav aria-label="Phone brands" className="flex gap-2 overflow-x-auto border-b border-(--border)">
+        <nav aria-label="Phone brands" className="grid grid-cols-3 gap-2 border-b border-(--border) pb-6 sm:gap-4">
           {brands.map((brand) => {
-            const count = products.filter((product) => product.brand === brand).length;
-            const isActive = activeBrand === brand;
+            const count = products.filter((product) => product.brand === brand.name).length;
+            const isActive = activeBrand === brand.name;
 
             return (
               <button
-                key={brand}
+                key={brand.name}
                 type="button"
-                onClick={() => selectBrand(brand)}
+                onClick={() => selectBrand(brand.name)}
                 aria-pressed={isActive}
-                className={`shrink-0 border-b-2 px-4 py-3 text-sm font-semibold transition-colors ${
+                className={`min-w-0 overflow-hidden border text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--accent-2) ${
                   isActive
-                    ? 'border-(--accent-2) text-foreground'
-                    : 'border-transparent text-(--muted) hover:text-foreground'
+                    ? 'border-(--accent-2) bg-(--surface-alt) text-foreground'
+                    : 'border-(--border) bg-(--surface) text-(--muted) hover:border-(--accent-2) hover:text-foreground'
                 }`}
               >
-                {brand} <span className="ml-1 text-xs font-medium opacity-70">{count}</span>
+                <span className="relative block aspect-square overflow-hidden bg-(--surface-alt) sm:aspect-[4/3]">
+                  <Image
+                    src={getImageUrl(brand.image)}
+                    alt={brand.alt}
+                    fill
+                    sizes="(max-width: 640px) 33vw, 400px"
+                    className="object-cover transition-transform duration-300 hover:scale-[1.03]"
+                  />
+                </span>
+                <span className="flex min-h-12 items-center justify-between gap-1 px-2 py-2 sm:px-4">
+                  <span className="truncate text-xs font-bold sm:text-sm">{brand.name}</span>
+                  <span className="shrink-0 text-[10px] text-(--muted) sm:text-xs">{count}</span>
+                </span>
               </button>
             );
           })}
