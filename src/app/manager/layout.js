@@ -64,6 +64,14 @@ export default function ManagerLayout({ children }) {
   return (
     <div className="min-h-screen bg-[#F8F9FB] pt-8 pb-20 transition-colors duration-300 dark:bg-slate-950">
       <div className="max-w-6xl mx-auto px-6">
+        {user.isDemo && (
+          <div
+            role="status"
+            className="mb-6 rounded-2xl border border-amber-300 bg-amber-50 px-5 py-3 text-sm font-semibold text-amber-900 dark:border-amber-800 dark:bg-amber-950/40 dark:text-amber-200"
+          >
+            Demo mode: browsing is enabled, but changes are disabled.
+          </div>
+        )}
         
         {/* Header Glass Card */}
         <div className="relative overflow-hidden bg-white/70 backdrop-blur-md rounded-3xl border border-gray-100 p-6 md:p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6 transition-all duration-300 hover:shadow-md dark:bg-slate-900/80 dark:border-slate-800">

@@ -5,6 +5,9 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 const AuthContext = createContext();
 
 const ONE_HOUR_MS = 3600000;
+const DEMO_PORTFOLIO_ORIGIN =
+  process.env.NEXT_PUBLIC_DEMO_PORTFOLIO_ORIGIN ||
+  'https://web-portfolio-rouge-zeta.vercel.app';
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -87,7 +90,7 @@ export const AuthProvider = ({ children }) => {
   }, [user, logout]);
 
   // 3. UPDATED LOGIN FUNCTION (Synchronizes Cookies with LocalStorage)
-  const login = (userData) => {
+  const login = useCallback((userData) => {
     setUser(userData);
     
     if (typeof window !== 'undefined') {
@@ -106,7 +109,46 @@ export const AuthProvider = ({ children }) => {
         document.cookie = `user_role=${userData.role}; path=/; max-age=${maxAgeSeconds}; SameSite=Lax`;
       }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const handleDemoMessage = (event) => {
+      if (
+        !window.opener ||
+        event.origin !== DEMO_PORTFOLIO_ORIGIN ||
+        event.source !== window.opener
+      ) {
+        return;
+      }
+
+      const session = event.data;
+      if (
+        session?.type !== 'portfolio-demo-session' ||
+        typeof session.token !== 'string' ||
+        session.user?.role !== 'manager' ||
+        session.user?.isDemo !== true
+      ) {
+        return;
+      }
+
+      localStorage.setItem('token', session.token);
+      login(session.user);
+      window.opener.postMessage(
+        { type: 'pixelplays-demo-session-received' },
+        DEMO_PORTFOLIO_ORIGIN
+      );
+    };
+
+    window.addEventListener('message', handleDemoMessage);
+    if (window.opener) {
+      window.opener.postMessage(
+        { type: 'pixelplays-demo-ready' },
+        DEMO_PORTFOLIO_ORIGIN
+      );
+    }
+
+    return () => window.removeEventListener('message', handleDemoMessage);
+  }, [login]);
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>

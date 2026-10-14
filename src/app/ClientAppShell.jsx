@@ -1,8 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
-import { usePathname } from "next/navigation";
-import { AuthProvider } from "@/Context/AuthContext";
+import { createContext, useContext, useEffect, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { AuthProvider, useAuth } from "@/Context/AuthContext";
 import { CartProvider } from "@/Context/CartContext";
 import Navbar from "@/Components/General/Navbar";
 import Footer from "@/Components/General/footer";
@@ -19,6 +19,19 @@ export function useShopState() {
   return context;
 }
 
+function DemoDashboardRedirect() {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (user?.role === "manager" && user?.isDemo === true) {
+      router.replace("/manager/products");
+    }
+  }, [user, router]);
+
+  return null;
+}
+
 export default function ClientAppShell({ children }) {
   const pathname = usePathname();
   const isCheckoutPage = pathname === "/checkout";
@@ -32,6 +45,7 @@ export default function ClientAppShell({ children }) {
   return (
     <AuthProvider>
       <CartProvider>
+        <DemoDashboardRedirect />
         <ShopStateContext.Provider value={sharedState}>
           <Navbar
             search={search}
